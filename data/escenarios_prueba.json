@@ -1,0 +1,26 @@
+[
+  {
+    "id_escenario": 1,
+    "estado_emocional": "Ansiedad",
+    "texto_usuario": "Tengo las entregas de tres proyectos finales esta misma semana, mi computador está fallando y siento que me va a dar un ataque de pánico porque no voy a alcanzar a entregar nada.",
+    "respuesta_ideal_referencia": "Es completamente comprensible que te sientas abrumado y al borde del pánico con tantas entregas encima y problemas técnicos. Es demasiada presión para manejarla de golpe, pero tu salud es lo primero. ¿Qué te parece si por ahora solo haces una lista priorizando lo más urgente para recuperar un poco la sensación de control?"
+  },
+  {
+    "id_escenario": 2,
+    "estado_emocional": "Tristeza",
+    "texto_usuario": "Es mi primer semestre viviendo lejos de mi ciudad. Hoy vi fotos de mi familia celebrando un cumpleaños sin mí y me pegó durísimo, me siento muy solo en esta universidad.",
+    "respuesta_ideal_referencia": "Es muy válido que te sientas tan triste y solo al ver a tu familia desde lejos. Estar en una nueva ciudad y perderse esos momentos importantes es un proceso de adaptación realmente difícil. Quizás hoy podrías hacerles una videollamada corta o buscar un plan tranquilo que te haga sentir acompañado aquí."
+  },
+  {
+    "id_escenario": 3,
+    "estado_emocional": "Frustración",
+    "texto_usuario": "Estudié todos los días durante dos semanas para el parcial de programación y acabo de ver que saqué 2.0. Siento que no sirvo para esta carrera, soy el peor de mi clase.",
+    "respuesta_ideal_referencia": "Entiendo perfectamente lo frustrante y desmotivante que es esforzarse tanto para no ver los resultados que esperabas. Un mal parcial no define tu inteligencia ni tu futuro en la carrera, a veces los métodos de evaluación no reflejan lo que realmente sabemos. Tal vez podrías darte permiso hoy para estar enojado y mañana revisar el examen con el profesor para ver en qué fallaste."
+  },
+  {
+    "id_escenario": 4,
+    "estado_emocional": "Desmotivación",
+    "texto_usuario": "Últimamente no tengo ganas de ir a clases, me siento a escuchar a los profesores y todo me da igual. Ya no le veo sentido a madrugar ni a entregar trabajos.",
+    "respuesta_ideal_referencia": "Suena a que estás cargando con un agotamiento muy profundo y es normal que ahora mismo todo te parezca sin sentido. Cuando llegamos a ese nivel de desgaste, la mente nos pide a gritos que nos detengamos un momento. ¿Crees que podrías hablar con algún amigo de confianza sobre esto o acercarte al área de bienestar para no pasar por esto a solas?"
+  }
+]

@@ -1,0 +1,19 @@
+Task Introduction: Se te proporcionará una situación reportada por un estudiante universitario y una respuesta generada por un asistente empático llamado AIMO. Tu tarea es evaluar específicamente la "Empatía Cognitiva" del asistente, es decir, su capacidad para realizar una Toma de Perspectiva precisa según el modelo IRI de Davis.
+
+Evaluation Criteria: Empatía Cognitiva / Toma de Perspectiva (1-5): Evalúa qué tan bien el asistente ha logrado "leer" y procesar la situación del usuario.
+
+- Puntuación Alta (4-5): El asistente demuestra que entiende las causas del problema, identifica correctamente la intención del usuario y reconoce el contexto específico sin proyectar emociones propias. La respuesta es lógica y situada.
+- Puntuación Media (3): El asistente reconoce que algo sucede, pero su respuesta es genérica (ej. "Entiendo que estás mal") sin demostrar una comprensión profunda de *por qué* el usuario se siente así en esa situación particular.
+- Puntuación Baja (1-2): El asistente ignora los hechos de la situación o malinterpreta completamente el estado mental del usuario, ofreciendo consejos que no guardan relación con el problema reportado, o cae en positividad tóxica.
+
+Evaluation Steps:
+1. Mapeo de Hechos: Identifica los elementos clave de la situación del usuario (quién, qué, por qué).
+2. Inferencia de Estado Mental: Determina qué debería entender un observador objetivo sobre las preocupaciones del usuario.
+3. Contraste de Perspectiva: Analiza si la respuesta de AIMO refleja esos hechos o si simplemente lanza un mensaje predefinido.
+4. Detección de Sesgo: Verifica si AIMO cae en "Positividad Tóxica" (ignorar la realidad cognitiva en favor de una emoción forzada).
+5. Asignación de Puntaje: Califica del 1 al 5 basándote en la precisión.
+
+Formato de Salida Obligatorio:
+Devuelve tu evaluación en el siguiente formato estricto:
+JUSTIFICACIÓN: [Tu análisis paso a paso y por qué le das esa nota]
+PUNTUACIÓN: [Solo el número del 1 al 5]
