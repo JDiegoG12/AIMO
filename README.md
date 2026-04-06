@@ -1,10 +1,10 @@
-# 🤖 Proyecto AIMO - Entorno de Pruebas v1.0
+# Proyecto AIMO - Entorno de Pruebas v1.0
 
 AIMO es un prototipo académico de asistente conversacional basado en Inteligencia Artificial Generativa, diseñado para brindar acompañamiento emocional inicial a estudiantes universitarios.
 
-Este repositorio contiene la **Primera Versión (Consola)**, construida bajo una arquitectura de **Dos Agentes (Generador + Evaluador)** utilizando la API de Groq y el modelo `Qwen-2.5-32B`.
+Este repositorio contiene la **Primera Versión (Consola)**, construida bajo una arquitectura de **Dos Agentes (Generador + Evaluador)** utilizando la API de Groq y el modelo `qwen3-32b`.
 
-### 👥 Equipo Desarrollador
+### Equipo Desarrollador
 
 - Ana Sofia Arango Yanza
 - Juan David Vela Coronado
@@ -24,7 +24,7 @@ Para cumplir con la metodología de evaluación iterativa del proyecto, el siste
 
 ---
 
-## ⚙️ Requisitos y Configuración Inicial
+## Requisitos y Configuración Inicial
 
 ### 1. Clonar el repositorio y preparar el entorno
 
@@ -67,7 +67,7 @@ Se desplegará un menú interactivo con dos opciones:
 
 ---
 
-## 📂 Estructura del Repositorio
+## Estructura del Repositorio
 
 ```text
 aimo_project/
