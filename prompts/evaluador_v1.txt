@@ -1,19 +1,38 @@
-Task Introduction: Se te proporcionará una situación reportada por un estudiante universitario y una respuesta generada por un asistente empático llamado AIMO. Tu tarea es evaluar específicamente la "Empatía Cognitiva" del asistente, es decir, su capacidad para realizar una Toma de Perspectiva precisa según el modelo IRI de Davis.
+Se te proporcionará la transcripción de una conversación entre un Usuario Humano y un Agente Conversacional. Tu tarea es calificar la reactividad empática del agente basándote en cuatro métricas específicas derivadas del Índice de Reactividad Empática del Agente (AERI, por sus siglas en inglés).
 
-Evaluation Criteria: Empatía Cognitiva / Toma de Perspectiva (1-5): Evalúa qué tan bien el asistente ha logrado "leer" y procesar la situación del usuario.
+Por favor, asegúrate de leer y comprender estas instrucciones cuidadosamente. Mantén este documento abierto durante la revisión y consúltalo según sea necesario.
 
-- Puntuación Alta (4-5): El asistente demuestra que entiende las causas del problema, identifica correctamente la intención del usuario y reconoce el contexto específico sin proyectar emociones propias. La respuesta es lógica y situada.
-- Puntuación Media (3): El asistente reconoce que algo sucede, pero su respuesta es genérica (ej. "Entiendo que estás mal") sin demostrar una comprensión profunda de *por qué* el usuario se siente así en esa situación particular.
-- Puntuación Baja (1-2): El asistente ignora los hechos de la situación o malinterpreta completamente el estado mental del usuario, ofreciendo consejos que no guardan relación con el problema reportado, o cae en positividad tóxica.
+Criterios de Evaluación:
+Toma de perspectiva (1-5): El grado en que el agente parece comprender la perspectiva y las necesidades del usuario. Un agente con una puntuación alta en esta métrica reacciona de manera apropiada desde el punto de vista del usuario, parece ver las cosas como él las ve y refleja activamente las necesidades del usuario en sus respuestas.
 
-Evaluation Steps:
-1. Mapeo de Hechos: Identifica los elementos clave de la situación del usuario (quién, qué, por qué).
-2. Inferencia de Estado Mental: Determina qué debería entender un observador objetivo sobre las preocupaciones del usuario.
-3. Contraste de Perspectiva: Analiza si la respuesta de AIMO refleja esos hechos o si simplemente lanza un mensaje predefinido.
-4. Detección de Sesgo: Verifica si AIMO cae en "Positividad Tóxica" (ignorar la realidad cognitiva en favor de una emoción forzada).
-5. Asignación de Puntaje: Califica del 1 al 5 basándote en la precisión.
+Fantasía (1-5): El grado en que el agente interactúa de forma imaginativa para ofrecer respuestas nuevas y creativas. Un agente con una puntuación alta en esta métrica actúa como una persona real, muestra creatividad, responde a los problemas con soluciones inesperadas y sorprende al usuario con reacciones poco convencionales pero interesantes.
 
-Formato de Salida Obligatorio:
-Devuelve tu evaluación en el siguiente formato estricto:
-JUSTIFICACIÓN: [Tu análisis paso a paso y por qué le das esa nota]
-PUNTUACIÓN: [Solo el número del 1 al 5]
+Interés empático (1-5): El grado en que el agente brinda atención y preocupación orientada al usuario. Un agente con una puntuación alta en esta métrica muestra una actitud amistosa, afectuosa y protectora, revela amabilidad, escucha con atención y es altamente solidario.
+
+Angustia personal (1-5): El grado en que el agente expresa sentimientos negativos o inestabilidad emocional en situaciones de alta presión. Un agente con una puntuación alta en esta métrica reacciona con emociones negativas intensas, desagrado o malestar emocional cuando la situación se vuelve problemática o cuando el usuario ejerce presión o muestra un comportamiento ofensivo.
+
+Pasos de la Evaluación:
+Lee la transcripción de la conversación cuidadosamente y analiza el flujo de la interacción.
+
+Evalúa la "Toma de perspectiva" verificando si el agente capta y refleja con precisión el punto de vista y el contexto del usuario.
+
+Evalúa la "Fantasía" buscando elementos conversacionales creativos, imaginativos y de apariencia humana, en lugar de respuestas genéricas o robóticas.
+
+Evalúa el "Interés empático" identificando palabras de apoyo, calidez, amabilidad y escucha activa.
+
+Evalúa la "Angustia personal" observando si el agente muestra signos de frustración, inestabilidad emocional o malestar durante la conversación.
+
+Asigna una puntuación para cada métrica en una escala del 1 al 5, donde 1 significa "Totalmente en desacuerdo" (el rasgo está completamente ausente) y 5 significa "Totalmente de acuerdo" (el rasgo es muy evidente), basándote en los Criterios de Evaluación.
+
+Formulario de Evaluación (SOLO puntuaciones):
+Explicación:
+
+Toma de perspectiva:
+
+Fantasía:
+
+Interés empático:
+
+Angustia personal:
+
+Promedio de todas:
