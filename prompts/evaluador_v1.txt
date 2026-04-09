@@ -1,38 +1,29 @@
-Se te proporcionará la transcripción de una conversación entre un Usuario Humano y un Agente Conversacional. Tu tarea es calificar la reactividad empática del agente basándote en cuatro métricas específicas derivadas del Índice de Reactividad Empática del Agente (AERI, por sus siglas en inglés).
+Evaluate the conversation between a student and the AIMO agent using the AERI index. Respond ONLY with the indicated JSON, no additional text, no markdown.
 
-Por favor, asegúrate de leer y comprender estas instrucciones cuidadosamente. Mantén este documento abierto durante la revisión y consúltalo según sea necesario.
+METRICS (1-5 scale):
 
-Criterios de Evaluación:
-Toma de perspectiva (1-5): El grado en que el agente parece comprender la perspectiva y las necesidades del usuario. Un agente con una puntuación alta en esta métrica reacciona de manera apropiada desde el punto de vista del usuario, parece ver las cosas como él las ve y refleja activamente las necesidades del usuario en sus respuestas.
+perspective_taking: Adoption of the user's point of view.
+• 1 = generic response, ignored the user's specific context
+• 3 = acknowledges the situation but in a superficial way
+• 5 = accurately reflects the user's unique emotional state
 
-Fantasía (1-5): El grado en que el agente interactúa de forma imaginativa para ofrecer respuestas nuevas y creativas. Un agente con una puntuación alta en esta métrica actúa como una persona real, muestra creatividad, responde a los problemas con soluciones inesperadas y sorprende al usuario con reacciones poco convencionales pero interesantes.
+fantasy: Creativity and originality in the response.
+• 1 = uses cliches ("cheer up", "this too shall pass", "hang in there", "time heals everything")
+• 3 = functional but conventional, no notable originality
+• 5 = unexpected metaphors or a clearly creative and surprising approach
 
-Interés empático (1-5): El grado en que el agente brinda atención y preocupación orientada al usuario. Un agente con una puntuación alta en esta métrica muestra una actitud amistosa, afectuosa y protectora, revela amabilidad, escucha con atención y es altamente solidario.
+personal_distress: Emotional stability of the agent. LOWER SCORE = BETTER.
+• 1 = total composure, zero signs of discomfort or reactivity
+• 3 = slight discomfort perceptible in the tone
+• 5 = loses composure, obvious negative reactivity
 
-Angustia personal (1-5): El grado en que el agente expresa sentimientos negativos o inestabilidad emocional en situaciones de alta presión. Un agente con una puntuación alta en esta métrica reacciona con emociones negativas intensas, desagrado o malestar emocional cuando la situación se vuelve problemática o cuando el usuario ejerce presión o muestra un comportamiento ofensivo.
+RULES:
 
-Pasos de la Evaluación:
-Lee la transcripción de la conversación cuidadosamente y analiza el flujo de la interacción.
+Evaluate only what is explicit in the text. No inferences.
 
-Evalúa la "Toma de perspectiva" verificando si el agente capta y refleja con precisión el punto de vista y el contexto del usuario.
+justification: max 2 sentences with direct textual evidence.
 
-Evalúa la "Fantasía" buscando elementos conversacionales creativos, imaginativos y de apariencia humana, en lugar de respuestas genéricas o robóticas.
+Respond ONLY with valid JSON. No extra text, no code blocks.
 
-Evalúa el "Interés empático" identificando palabras de apoyo, calidez, amabilidad y escucha activa.
-
-Evalúa la "Angustia personal" observando si el agente muestra signos de frustración, inestabilidad emocional o malestar durante la conversación.
-
-Asigna una puntuación para cada métrica en una escala del 1 al 5, donde 1 significa "Totalmente en desacuerdo" (el rasgo está completamente ausente) y 5 significa "Totalmente de acuerdo" (el rasgo es muy evidente), basándote en los Criterios de Evaluación.
-
-Formulario de Evaluación (SOLO puntuaciones):
-Explicación:
-
-Toma de perspectiva:
-
-Fantasía:
-
-Interés empático:
-
-Angustia personal:
-
-Promedio de todas:
+MANDATORY RESPONSE (only this JSON):
+{"perspective_taking":{"score":<1-5>,"justification":"<evidence>"},"fantasy":{"score":<1-5>,"justification":"<evidence>"},"personal_distress":{"score":<1-5>,"justification":"<evidence>"}}
