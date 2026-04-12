@@ -5,6 +5,7 @@ import SpeechBubble    from './components/SpeechBubble'
 import ConvoLog        from './components/ConvoLog'
 import UserInput       from './components/UserInput'
 import AdminPanel      from './components/AdminPanel'
+import ThinkLog        from './components/ThinkLog'
 import { useTypewriter } from './hooks/useTypewriter'
 import './App.css'
 
@@ -30,7 +31,8 @@ export default function App() {
   const [phase,       setPhase]       = useState(PHASES.INTRO)
   const [messages,    setMessages]    = useState([])
   const [adminOpen,   setAdminOpen]   = useState(false)
-  const [historyOpen, setHistoryOpen] = useState(false) // ← Nuevo estado para el modal de Historial
+  const [historyOpen, setHistoryOpen] = useState(false)
+  const [thinkOpen,   setThinkOpen]   = useState(false)
   const sessionId = useRef(`s_${Date.now()}`)
   const { displayed, isTyping, type } = useTypewriter()
 
@@ -62,9 +64,11 @@ export default function App() {
       }
 
       setMessages(prev =>[...prev, {
-        role:       'aimo',
-        text:       data.response,
-        evaluation: data.evaluation ?? null,
+        role:           'aimo',
+        text:           data.response,
+        thinking:       data.thinking       ?? null,
+        evaluation:     data.evaluation     ?? null,
+        classification: data.classification ?? null,
       }])
       setPhase(PHASES.RESPOND)
       type(data.response, 26, () => setPhase(PHASES.USER))
@@ -94,7 +98,8 @@ export default function App() {
     setTimeout(() => type(GREETING, 28, () => setPhase(PHASES.USER)), 200)
   }
 
-  const evalCount = messages.filter(m => m.role === 'aimo' && m.evaluation).length
+  const evalCount  = messages.filter(m => m.role === 'aimo' && m.evaluation).length
+  const thinkCount = messages.filter(m => m.role === 'aimo' && m.thinking).length
 
   return (
     <div className="game-root">
@@ -105,15 +110,25 @@ export default function App() {
 
       {/* ── Interfaz HUD Superior Derecha ── */}
       <div className="top-right-hud">
-        <button 
-          className="hud-btn" 
+        <button
+          className="hud-btn"
           onClick={() => setHistoryOpen(true)}
           aria-label="Abrir historial"
         >
           <span className="admin-icon">📜</span>
           <span className="admin-label">HISTORIAL</span>
         </button>
-        
+
+        <button
+          className="hud-btn"
+          onClick={() => setThinkOpen(true)}
+          aria-label="Ver cadena de pensamiento"
+        >
+          <span className="admin-icon">💭</span>
+          <span className="admin-label">PENSAMIENTO</span>
+          {thinkCount > 0 && <span className="admin-badge">{thinkCount}</span>}
+        </button>
+
         <button
           className="hud-btn"
           onClick={() => setAdminOpen(true)}
@@ -149,6 +164,10 @@ export default function App() {
       {/* ── Modales ── */}
       {historyOpen && (
         <ConvoLog messages={messages} onReset={handleReset} onClose={() => setHistoryOpen(false)} />
+      )}
+
+      {thinkOpen && (
+        <ThinkLog messages={messages} onClose={() => setThinkOpen(false)} />
       )}
 
       {adminOpen && (

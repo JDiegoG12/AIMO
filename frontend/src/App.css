@@ -6,24 +6,32 @@
 :root {
   --font:      'Press Start 2P', monospace;
   --bubble-bg: #ffffff;
-  --bubble-bd: #231c3b; 
+  --bubble-bd: #231c3b;
   --user-bg:   #fffde7;
   --user-bd:   #e5a910;
-  
+
   /* Colores principales y sus sombras (necesarios para las barras) */
   --green:     #7bc950;
   --green-d:   #4a7a30;
-  
+
   --cyan:      #5de0e6;
   --cyan-d:    #0ea5e9;
-  
+
   --yellow:    #ffce31;
   --yellow-d:  #b08000;
-  
+
   --red:       #e05555;
   --red-d:     #903030;
-  
+
   --text-world:#1a1040;
+
+  /* Emotion classification colors (Russell 1980 circumplex) */
+  --em-sadness:    #4a9eff;
+  --em-anxiety:    #ff9f43;
+  --em-anger:      #e05555;
+  --em-overwhelm:  #9b59b6;
+  --em-loneliness: #95a5a6;
+  --em-neutral:    #7bc950;
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -119,8 +127,12 @@ html, body, #root {
    ══════════════════════════════════════════════════════════════════ */
 .character-col {
   position: absolute; left: 50%; transform: translateX(-50%);
-  bottom: 125px; /* Subimos a AIMO para que no le tapen los pies */
-  z-index: 10; display: flex; flex-direction: column; align-items: center;
+  top: 62px;    /* below HUD — bubble can never escape above this */
+  bottom: 125px;
+  z-index: 10;
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: flex-end; /* AIMO always grounded; bubble fills what's above */
+  width: min(780px, 92vw);   /* much wider → text wraps less → shorter height */
 }
 
 .aimo-img {
@@ -154,9 +166,15 @@ html, body, #root {
    GLOBO DE TEXTO DE AIMO
    ══════════════════════════════════════════════════════════════════ */
 .speech-wrap-aimo {
-  margin-bottom: 30px; min-width: 280px; max-width: 480px;
+  margin-bottom: 30px;
+  width: 100%;       /* fills the wider character-col */
+  min-width: unset;  /* removes old 280px floor */
+  max-width: none;   /* removes old 480px ceiling */
   filter: drop-shadow(0 12px 20px rgba(0,0,0,0.15));
   animation: float-bubble 3.5s ease-in-out infinite; z-index: 10;
+  /* safety valve: if content is still taller than the available space, scroll */
+  overflow-y: auto;
+  flex-shrink: 1;
 }
 @keyframes float-bubble { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
 
@@ -165,6 +183,9 @@ html, body, #root {
   font-size: 10px; line-height: 2.3; padding: 22px 26px 20px; position: relative; min-height: 80px;
   border: 8px solid var(--bubble-bd);
   box-shadow: -16px 0 0 0 var(--bubble-bd), 16px 0 0 0 var(--bubble-bd), 0 -16px 0 0 var(--bubble-bd), 0 16px 0 0 var(--bubble-bd), -8px -8px 0 0 var(--bubble-bg), 8px -8px 0 0 var(--bubble-bg), -8px 8px 0 0 var(--bubble-bg), 8px 8px 0 0 var(--bubble-bg);
+  /* always show content; grow vertically and horizontally naturally */
+  overflow-y: auto;
+  max-height: calc(100vh - 340px); /* hard cap: character (290px) + input (120px) + padding */
 }
 .speech-bubble-pixel::after {
   content: ''; position: absolute; bottom: -32px; left: 50%; transform: translateX(-50%);
@@ -349,6 +370,93 @@ html, body, #root {
 .ap-empty { display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; gap:14px; text-align:center; font-size:8px; color:#6a6aaa; line-height:2.5; }
 
 /* ══════════════════════════════════════════════════════════════════
+   ADMIN PANEL TABS
+   ══════════════════════════════════════════════════════════════════ */
+.ap-tabs {
+  display: flex;
+  flex-shrink: 0;
+  border-bottom: 3px solid rgba(240,192,64,.3);
+  background: rgba(0,0,0,.2);
+}
+.ap-tab {
+  flex: 1;
+  background: transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -3px;
+  color: #6a6aaa;
+  font-family: var(--font);
+  font-size: 7px;
+  padding: 12px 8px;
+  cursor: pointer;
+  letter-spacing: 1px;
+  transition: background .15s, color .15s;
+}
+.ap-tab:hover { background: rgba(240,192,64,.05); color: #a0a0cc; }
+.ap-tab.ap-tab-active {
+  background: rgba(240,192,64,.08);
+  color: var(--yellow);
+  border-bottom-color: var(--yellow);
+  text-shadow: 0 0 8px rgba(255,206,49,.4);
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   EMOTION CLASSIFICATION CARDS
+   ══════════════════════════════════════════════════════════════════ */
+.em-grid { display: flex; gap: 14px; flex-wrap: wrap; align-items: flex-start; margin-top: 4px; }
+.em-field { display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 80px; }
+.em-label { font-size: 6px; color: #6a6aaa; letter-spacing: 1px; }
+
+.em-badge {
+  font-size: 7px; padding: 4px 8px; letter-spacing: 1px;
+  border: 2px solid; display: inline-block; width: fit-content;
+}
+.em-sadness    { color: var(--em-sadness);    border-color: var(--em-sadness);    background: rgba(74,158,255,.1); }
+.em-anxiety    { color: var(--em-anxiety);    border-color: var(--em-anxiety);    background: rgba(255,159,67,.1); }
+.em-anger      { color: var(--em-anger);      border-color: var(--em-anger);      background: rgba(224,85,85,.1); }
+.em-overwhelm  { color: var(--em-overwhelm);  border-color: var(--em-overwhelm);  background: rgba(155,89,182,.1); }
+.em-loneliness { color: var(--em-loneliness); border-color: var(--em-loneliness); background: rgba(149,165,166,.1); }
+.em-neutral    { color: var(--em-neutral);    border-color: var(--em-neutral);    background: rgba(123,201,80,.1); }
+
+.em-intensity { display: flex; align-items: center; gap: 4px; }
+.em-pip {
+  width: 10px; height: 10px;
+  background: #2a2a44; border: 2px solid #3a3a5a; display: inline-block;
+}
+.em-pip.em-pip-on { background: var(--yellow); border-color: var(--yellow-d); box-shadow: 0 0 4px var(--yellow); }
+.em-intensity-num { font-size: 7px; color: var(--yellow); margin-left: 4px; }
+
+.em-topic { font-size: 7px; color: var(--cyan); letter-spacing: 1px; }
+
+.em-crisis-badge {
+  font-size: 7px; color: var(--red); border: 2px solid var(--red);
+  padding: 3px 8px; background: rgba(224,85,85,.12); letter-spacing: 1px;
+  animation: pulse-alert 1s ease-in-out infinite alternate;
+}
+@keyframes pulse-alert { 0% { opacity: .7; } 100% { opacity: 1; box-shadow: 0 0 8px var(--red); } }
+
+/* Emotion chip in ConvoLog message header */
+.msg-em-chip {
+  font-size: 6px; color: #8888b8; margin-left: 8px;
+  opacity: .85; letter-spacing: 1px;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   THINK LOG — CADENA DE PENSAMIENTO
+   ══════════════════════════════════════════════════════════════════ */
+.think-tag-label {
+  font-size: 7px; color: #6a6aaa; letter-spacing: 1px; opacity: .7;
+}
+.think-block {
+  background: rgba(93,224,230,.04);
+  border-left: 3px solid rgba(93,224,230,.25);
+  padding: 12px 14px;
+  font-size: 7px; line-height: 2.4; color: #9898c8;
+  white-space: pre-wrap; word-break: break-word;
+  font-family: var(--font);
+}
+
+/* ══════════════════════════════════════════════════════════════════
    RESPONSIVO
    ══════════════════════════════════════════════════════════════════ */
 @media (max-width: 860px) {
@@ -356,9 +464,10 @@ html, body, #root {
   .game-root { height: auto; min-height: 100vh; }
   .sun-bg { top: 8%; left: 5%; width: 50px; height: 50px; }
   
-  .character-col { bottom: 150px; left: 50%; transform: translateX(-50%); }
+  .character-col { top: 56px; bottom: 150px; width: 96vw; }
   .aimo-img { width: 220px; }
   .aimo-ground-shadow { width: 100px; bottom: -15px; }
+  .speech-bubble-pixel { font-size: 9px; max-height: calc(100vh - 320px); }
   
   .rpg-input-col { bottom: 12px; width: 95%; }
   .user-input-row { gap: 8px; }

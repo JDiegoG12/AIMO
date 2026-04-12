@@ -1,11 +1,30 @@
 import { useEffect, useRef } from 'react'
 
+const EMOTION_EMOJI = {
+  sadness:    '💙',
+  anxiety:    '🟠',
+  anger:      '🔴',
+  overwhelm:  '💜',
+  loneliness: '🩶',
+  neutral:    '💚',
+}
+
 function MsgBubble({ message }) {
   const isUser = message.role === 'user'
+  const cl     = !isUser && message.classification ? message.classification : null
+
   return (
     <div className={`msg-bubble-wrap ${isUser ? 'wrap-user' : 'wrap-aimo'}`}>
       <span className={`msg-who ${isUser ? 'who-user' : 'who-aimo'}`}>
         {isUser ? '[ TÚ ]' : '[ AIMO ]'}
+        {cl && (
+          <span
+            className="msg-em-chip"
+            title={`${cl.emotion} · intensidad ${cl.intensity}/5${cl.crisis_signal ? ' · ⚠ crisis' : ''}`}
+          >
+            {EMOTION_EMOJI[cl.emotion] ?? '●'} {cl.emotion}
+          </span>
+        )}
       </span>
       <div className={`msg-pixel-bubble ${isUser ? 'bubble-user' : 'bubble-aimo'}`}>
         {message.text}
@@ -24,8 +43,8 @@ export default function ConvoLog({ messages, onReset, onClose }) {
   return (
     <div className="ap-overlay" onClick={onClose}>
       <div className="ap-panel" onClick={e => e.stopPropagation()} role="dialog" aria-label="Historial de conversación">
-        
-        {/* Header (Mismo estilo que AdminPanel) */}
+
+        {/* Header */}
         <div className="ap-header">
           <span className="ap-title">📜 HISTORIAL DE CONVERSACIÓN</span>
           <div style={{ display: 'flex', gap: '8px' }}>
@@ -40,7 +59,7 @@ export default function ConvoLog({ messages, onReset, onClose }) {
           <span>✦ Aquí puedes revisar todo lo que has hablado con AIMO.</span>
         </div>
 
-        {/* Scrollable messages con fondo oscuro */}
+        {/* Scrollable messages */}
         <div className="ap-body convo-scroll-modal" role="log" aria-live="polite">
           {messages.length === 0 ? (
             <div className="ap-empty">
