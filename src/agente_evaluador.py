@@ -174,7 +174,7 @@ def evaluar_interaccion(mensaje_usuario: str, respuesta_aimo: str) -> dict | Non
 
     composite = round(weighted_sum / total_weight, 2) if total_weight > 0 else None
     evaluation['composite_score'] = composite
-    evaluation['weighting_scheme'] = 'davis1980_abdAlrazaq2019'
+    evaluation['weighting_scheme'] = 'xu2024_abdAlrazaq2020'
 
     print(f"\n[evaluador] ✓ Composite score: {composite}/5")
     print(f"[evaluador] Métricas obtenidas: {list(evaluation.keys())}\n")
