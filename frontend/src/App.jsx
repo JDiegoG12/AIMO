@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef } from 'react'
-import WorldBackground from './components/WorldBackground'
-import AimoCharacter   from './components/AimoCharacter'
-import SpeechBubble    from './components/SpeechBubble'
-import ConvoLog        from './components/ConvoLog'
-import UserInput       from './components/UserInput'
-import AdminPanel      from './components/AdminPanel'
-import ThinkLog        from './components/ThinkLog'
+import WorldBackground        from './components/WorldBackground'
+import AimoCharacter          from './components/AimoCharacter'
+import SpeechBubble           from './components/SpeechBubble'
+import ConvoLog               from './components/ConvoLog'
+import UserInput              from './components/UserInput'
+import AdminPanel             from './components/AdminPanel'
+import ThinkLog               from './components/ThinkLog'
+import RecommendationsModal   from './components/RecommendationsModal'
 import { useTypewriter } from './hooks/useTypewriter'
 import './App.css'
 
@@ -28,11 +29,14 @@ function mockResponse() {
 }
 
 export default function App() {
-  const [phase,       setPhase]       = useState(PHASES.INTRO)
-  const [messages,    setMessages]    = useState([])
-  const [adminOpen,   setAdminOpen]   = useState(false)
-  const [historyOpen, setHistoryOpen] = useState(false)
-  const [thinkOpen,   setThinkOpen]   = useState(false)
+  const [phase,            setPhase]            = useState(PHASES.INTRO)
+  const [messages,         setMessages]         = useState([])
+  const [adminOpen,        setAdminOpen]        = useState(false)
+  const [historyOpen,      setHistoryOpen]      = useState(false)
+  const [thinkOpen,        setThinkOpen]        = useState(false)
+  const [pipelineComplete, setPipelineComplete] = useState(false)
+  const [recsOpen,         setRecsOpen]         = useState(false)
+  const [finalRecs,        setFinalRecs]        = useState(null)
   const sessionId = useRef(`s_${Date.now()}`)
   const { displayed, isTyping, type } = useTypewriter()
 
@@ -63,6 +67,8 @@ export default function App() {
         data = mockResponse()
       }
 
+      const isComplete = data.phase === 'complete'
+
       setMessages(prev =>[...prev, {
         role:           'aimo',
         text:           data.response,
@@ -70,8 +76,20 @@ export default function App() {
         evaluation:     data.evaluation     ?? null,
         classification: data.classification ?? null,
       }])
-      setPhase(PHASES.RESPOND)
-      type(data.response, 26, () => setPhase(PHASES.USER))
+
+      if (isComplete) {
+        // Final recommendations: show brief notice in bubble, open modal
+        setPipelineComplete(true)
+        setFinalRecs(data.response)
+        setPhase(PHASES.RESPOND)
+        type('He preparado unas recomendaciones para ti. Puedes verlas aquí ↑', 26, () => {
+          setPhase(PHASES.USER)
+          setRecsOpen(true)
+        })
+      } else {
+        setPhase(PHASES.RESPOND)
+        type(data.response, 26, () => setPhase(PHASES.USER))
+      }
 
     } catch (err) {
       console.error('[AIMO]', err)
@@ -94,6 +112,9 @@ export default function App() {
     }
     sessionId.current = `s_${Date.now()}`
     setMessages([])
+    setPipelineComplete(false)
+    setFinalRecs(null)
+    setRecsOpen(false)
     setPhase(PHASES.INTRO)
     setTimeout(() => type(GREETING, 28, () => setPhase(PHASES.USER)), 200)
   }
@@ -156,7 +177,8 @@ export default function App() {
       {/* ── Input del usuario (Caja estilo RPG inferior) ── */}
       <div className="rpg-input-col">
         <UserInput
-          enabled={phase === PHASES.USER}
+          enabled={phase === PHASES.USER && !pipelineComplete}
+          complete={pipelineComplete}
           onSend={handleSend}
         />
       </div>
@@ -172,6 +194,17 @@ export default function App() {
 
       {adminOpen && (
         <AdminPanel messages={messages} onClose={() => setAdminOpen(false)} />
+      )}
+
+      {recsOpen && (
+        <RecommendationsModal text={finalRecs} onClose={() => setRecsOpen(false)} />
+      )}
+
+      {/* Button to reopen recommendations modal after closing */}
+      {pipelineComplete && !recsOpen && (
+        <button className="rec-reopen-btn" onClick={() => setRecsOpen(true)} aria-label="Ver recomendaciones">
+          ★ VER RECOMENDACIONES
+        </button>
       )}
     </div>
   )
