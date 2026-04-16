@@ -216,11 +216,11 @@ def generar_respuesta_aimo(
     Parameters
     ----------
     mensaje_usuario : str
-        The student's current message.
+        The user's current message.
     historial : list | None
         Existing conversation history. Initialized on first call.
     clasificacion : dict | None
-        Emotional classification from agente_clasificador (Mejora 2).
+        Emotional classification from agente_clasificador.
         When provided, the system prompt is adaptively modified for this turn.
 
     Returns

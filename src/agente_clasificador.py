@@ -1,7 +1,7 @@
 """
 Emotional State Classifier — AIMO pre-processor
 ────────────────────────────────────────────────
-Makes ONE Groq call before generar_respuesta_aimo to classify the student's
+Makes ONE Groq call before generar_respuesta_aimo to classify the user's
 emotional state, intensity, crisis signal, and topic.
 
 Theoretical basis:
@@ -81,7 +81,7 @@ def clasificar_estado_emocional(
     historial_reciente: list,
 ) -> dict:
     """
-    Classifies the emotional state of the student's message.
+    Classifies the emotional state of the user message.
 
     Uses only the last 2 messages from history for context (not the full
     history) to keep the call lightweight and focused on the current turn.
@@ -89,7 +89,7 @@ def clasificar_estado_emocional(
     Parameters
     ----------
     mensaje_usuario : str
-        The student's current message.
+        The user's current message.
     historial_reciente : list
         Full session history; only the last 2 entries are used.
 
