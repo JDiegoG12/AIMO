@@ -1,110 +1,140 @@
 """
-AIMO Flask API
-──────────────
-Expone los agentes AIMO y Evaluador como endpoints REST.
+AIMO Flask API — v2
+────────────────────
+3-stage pipeline:
+  1. Context Agent  (aimo_answer.txt)        — multi-turn natural conversation
+  2. Classifier     (aimo_classifier.txt)    — clinical risk assessment
+  3. Recommendations (aimo_recommendations.txt) — final personalized output
+
+Evaluation (OpenAI GPT-4o-mini) runs ONLY when recommendations are delivered,
+using the context + classification outputs as input.
 
 Endpoints:
   POST /api/chat   { "message": "...", "session_id": "..." }
-                   → { "response": "...", "evaluation": {...}, "classification": {...} }
+                   → { "response": "...", "phase": "gathering|complete",
+                       "evaluation": {...}|null, "classification": {...}|null }
 
   POST /api/reset  { "session_id": "..." }
                    → { "ok": true }
 
-Uso:
+Usage:
   pip install flask flask-cors
   python api.py
 """
 
 import json
-import re
 import sys
 import os
 
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 
-# Asegura que el directorio AIMO esté en el path
 sys.path.insert(0, os.path.dirname(__file__))
 
-from src.agente_aimo         import generar_respuesta_aimo
-from src.agente_evaluador    import evaluar_interaccion
-from src.agente_clasificador import clasificar_estado_emocional
+from src.agente_contexto        import obtener_contexto
+from src.agente_clasificador    import clasificar_riesgo
+from src.agente_recomendaciones import generar_recomendaciones
+from src.agente_evaluador       import evaluar_interaccion
 
 app = Flask(__name__)
-CORS(app)  # Permite peticiones desde el dev server de Vite (localhost:5173)
+CORS(app)
 
-# Historial de conversaciones por session_id (en memoria)
+# Session structure per session_id:
+# {
+#   "context_history": list | None,  — conversation history for context agent
+#   "context_data":    dict | None,  — latest accumulated context JSON
+#   "phase":           str,          — "gathering" | "complete"
+# }
 _sessions: dict = {}
-
-
-def _separar_thinking(texto: str) -> tuple[str, str | None]:
-    """
-    Separates <think>...</think> reasoning from the actual response.
-    Returns (clean_response, thinking_text_or_None).
-    """
-    match = re.search(r'<think>(.*?)</think>', texto, re.DOTALL)
-    if match:
-        thinking = match.group(1).strip()
-        clean    = re.sub(r'<think>.*?</think>', '', texto, flags=re.DOTALL).strip()
-        return clean, thinking
-    return texto, None
 
 
 @app.route("/api/chat", methods=["POST"])
 def chat():
-    data      = request.get_json(silent=True) or {}
-    mensaje   = data.get("message", "").strip()
+    data       = request.get_json(silent=True) or {}
+    mensaje    = data.get("message", "").strip()
     session_id = data.get("session_id", "default")
 
     if not mensaje:
         return jsonify({"error": "El campo 'message' es obligatorio."}), 400
 
-    # Recuperar o inicializar el historial de la sesión
-    historial = _sessions.get(session_id)
+    session = _sessions.get(session_id, {
+        "context_history": None,
+        "context_data":    None,
+        "phase":           "gathering",
+    })
 
-    # ── Mejora 1: Clasificar estado emocional ─────────────────────────────────
-    # Uses only the last 2 messages from history for context (lightweight call).
-    # crisis_signal triggers safety override inside _construir_prompt_adaptativo.
-    historial_reciente = historial[-2:] if historial else []
-    clasificacion = clasificar_estado_emocional(mensaje, historial_reciente)
+    # ── Phase: complete — conversation already finished ───────────────────────
+    if session.get("phase") == "complete":
+        return jsonify({
+            "response": (
+                "Ya hemos completado nuestra conversación. "
+                "Si deseas comenzar de nuevo, puedes reiniciar la sesión."
+            ),
+            "phase":          "complete",
+            "evaluation":     None,
+            "classification": None,
+        })
 
-    # ── Generar respuesta de AIMO (con clasificación para prompt adaptativo) ──
-    try:
-        respuesta_raw, historial_actualizado = generar_respuesta_aimo(
-            mensaje,
-            historial,
-            clasificacion=clasificacion,
-        )
-        # Separate <think> chain-of-thought from the visible response
-        respuesta, thinking = _separar_thinking(respuesta_raw)
-        # Store clean response in history (no <think> tags visible to next turns)
-        if historial_actualizado and historial_actualizado[-1]["role"] == "assistant":
-            historial_actualizado[-1]["content"] = respuesta
-        _sessions[session_id] = historial_actualizado
-    except Exception as e:
-        print(f"[api] Error en agente AIMO: {e}")
-        return jsonify({"error": str(e)}), 500
+    # ── Phase: gathering — run context agent ──────────────────────────────────
+    visible_response, context_json, context_history = obtener_contexto(
+        mensaje,
+        session.get("context_history"),
+    )
 
-    # ── Evaluar la interacción ─────────────────────────────────────────────────
+    session["context_history"] = context_history
+
+    if context_json:
+        session["context_data"] = context_json
+
+    is_complete = bool(context_json and context_json.get("complete", False))
+
+    if not is_complete:
+        # Still gathering context — return visible response to student
+        _sessions[session_id] = session
+        return jsonify({
+            "response":       visible_response,
+            "phase":          "gathering",
+            "evaluation":     None,
+            "classification": None,
+        })
+
+    # ── Context complete — run classifier + recommendations ───────────────────
+    context_data = session["context_data"]
+
+    # 1. Clinical risk classification
+    clasificacion = clasificar_riesgo(context_data)
+
+    # 2. Final personalized recommendations
+    recomendaciones = generar_recomendaciones(context_data, clasificacion)
+
+    # 3. Evaluation via OpenAI (only at this final stage)
     evaluacion = None
     try:
-        raw = evaluar_interaccion(mensaje, respuesta)
-        if isinstance(raw, str):
-            start = raw.find("{")
-            end   = raw.rfind("}") + 1
+        context_str      = json.dumps(
+            {k: v for k, v in context_data.items() if k != 'complete'},
+            ensure_ascii=False,
+        )
+        clasificacion_str = json.dumps(clasificacion, ensure_ascii=False)
+        raw_eval = evaluar_interaccion(context_str, clasificacion_str)
+
+        if isinstance(raw_eval, dict):
+            evaluacion = raw_eval
+        elif isinstance(raw_eval, str):
+            start = raw_eval.find("{")
+            end   = raw_eval.rfind("}") + 1
             if start != -1 and end > start:
-                evaluacion = json.loads(raw[start:end])
-            else:
-                evaluacion = json.loads(raw)
-        elif isinstance(raw, dict):
-            evaluacion = raw
+                evaluacion = json.loads(raw_eval[start:end])
     except Exception as e:
-        print(f"[api] Error al parsear evaluación: {e}")
-        evaluacion = None  # No fatal: la UI muestra evaluación opcional
+        print(f"[api] Error en evaluación: {e}")
+        evaluacion = None  # Non-fatal: UI handles missing evaluation gracefully
+
+    # Mark session as complete
+    session["phase"] = "complete"
+    _sessions[session_id] = session
 
     return jsonify({
-        "response":       respuesta,
-        "thinking":       thinking,
+        "response":       recomendaciones,
+        "phase":          "complete",
         "evaluation":     evaluacion,
         "classification": clasificacion,
     })
@@ -120,6 +150,6 @@ def reset():
 
 if __name__ == "__main__":
     print("═" * 50)
-    print("  AIMO API corriendo en http://localhost:5000")
+    print("  AIMO API v2 — http://localhost:5000")
     print("═" * 50)
     app.run(debug=True, port=5000)

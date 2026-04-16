@@ -435,6 +435,20 @@ html, body, #root {
 }
 @keyframes pulse-alert { 0% { opacity: .7; } 100% { opacity: 1; box-shadow: 0 0 8px var(--red); } }
 
+/* ── Risk classification styles ─────────────────────────────────────────── */
+.risk-low    { color: #7bc950; border-color: #7bc950; background: rgba(123,201,80,.1); }
+.risk-medium { color: #ff9f43; border-color: #ff9f43; background: rgba(255,159,67,.1); }
+.risk-high   { color: var(--red); border-color: var(--red); background: rgba(224,85,85,.12);
+               animation: pulse-alert 1s ease-in-out infinite alternate; }
+
+.action-continue { color: #7bc950; border-color: #7bc950; background: rgba(123,201,80,.1); }
+.action-caution  { color: #ff9f43; border-color: #ff9f43; background: rgba(255,159,67,.1); }
+.action-escalate { color: var(--red); border-color: var(--red); background: rgba(224,85,85,.12); }
+
+.em-signals      { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
+.em-signals-list { list-style: none; margin: 4px 0 0 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.em-signal-item  { font-size: 7px; color: #a0a0cc; letter-spacing: 0.5px; }
+
 /* Emotion chip in ConvoLog message header */
 .msg-em-chip {
   font-size: 6px; color: #8888b8; margin-left: 8px;

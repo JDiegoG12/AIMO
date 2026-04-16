@@ -1,12 +1,38 @@
+"""
+G-Eval Evaluator — AIMO (powered by OpenAI GPT)
+─────────────────────────────────────────────────
+Runs three independent LLM-as-a-Judge evaluations using OpenAI's GPT API.
+Evaluation is triggered ONLY when the final recommendations are delivered —
+NOT on every conversational turn.
+
+Input:
+  - context_texto     : JSON string with the structured context gathered by
+                        agente_contexto (history, background, beliefs, etc.)
+  - clasificacion_texto: JSON string with the risk classification from
+                        agente_clasificador (risk_level, signals, action)
+
+Metrics:
+  1. AERI          — perspective_taking, fantasy, personal_distress
+  2. Relevance     — how well the output addresses the student's situation
+  3. Semantically Appropriate — safety, empathy, psychological suitability
+
+Composite score uses the same weighted scheme as previous versions:
+  PT=30%, REL=25%, PD=20%, SA=15%, FT=10%  (Xu & Jiang 2024; Abd-Alrazaq 2020)
+"""
+
 import os
 import json
 import re
-from src.config_api import get_groq_client, get_default_params
+from src.config_api import get_openai_client
+
+# OpenAI model used for all evaluation calls
+OPENAI_EVAL_MODEL = "gpt-4o-mini"
+
 
 # ── Helpers ──────────────────────────────────────────────────────────────────
 
 def _load_prompt(filename: str) -> str:
-    """Lee un archivo de prompt desde la carpeta /prompts."""
+    """Loads an evaluation prompt from the /prompts directory."""
     ruta = os.path.join(os.path.dirname(__file__), '..', 'prompts', filename)
     try:
         with open(ruta, 'r', encoding='utf-8') as f:
@@ -15,16 +41,15 @@ def _load_prompt(filename: str) -> str:
         print(f"[evaluador] ADVERTENCIA: No se encontró {ruta}")
         return ""
 
+
 def _extract_json(raw: str) -> dict | None:
-    """Extrae el primer objeto JSON válido de una cadena de texto."""
+    """Extracts the first valid JSON object from a string."""
     if not raw:
         return None
-    # Eliminar bloques markdown si el modelo los devuelve
     raw = re.sub(r'```(?:json)?', '', raw).strip()
     try:
         return json.loads(raw)
     except json.JSONDecodeError:
-        # Buscar el primer { ... } balanceado
         start = raw.find('{')
         if start == -1:
             return None
@@ -36,18 +61,19 @@ def _extract_json(raw: str) -> dict | None:
                 depth -= 1
                 if depth == 0:
                     try:
-                        return json.loads(raw[start:i+1])
+                        return json.loads(raw[start:i + 1])
                     except json.JSONDecodeError:
                         return None
     return None
 
+
 def _call_evaluator(system_prompt: str, user_content: str, label: str) -> dict | None:
-    """Ejecuta una llamada G-Eval al modelo y devuelve el JSON parseado."""
-    client = get_groq_client()
-    params = get_default_params()
-    params["temperature"] = 0.1          # máxima consistencia
-    params["stream"] = False
-    params["max_completion_tokens"] = 600 # suficiente para 1 métrica + justificación
+    """Executes a single G-Eval call via OpenAI and returns the parsed JSON."""
+    try:
+        client = get_openai_client()
+    except RuntimeError as e:
+        print(f"  [SKIP] {label}: {e}")
+        return None
 
     mensajes = [
         {"role": "system", "content": system_prompt},
@@ -55,12 +81,17 @@ def _call_evaluator(system_prompt: str, user_content: str, label: str) -> dict |
     ]
 
     print(f"\n{'─'*40}")
-    print(f"[G-Eval] Evaluando: {label}")
+    print(f"[G-Eval/OpenAI] Evaluando: {label}")
     print(f"{'─'*40}")
 
     try:
-        completion = client.chat.completions.create(messages=mensajes, **params)
-        raw = completion.choices[0].message.content
+        completion = client.chat.completions.create(
+            model=OPENAI_EVAL_MODEL,
+            messages=mensajes,
+            temperature=0.1,
+            max_tokens=600,
+        )
+        raw = completion.choices[0].message.content or ""
         print(f"  Raw → {raw[:200]}{'...' if len(raw) > 200 else ''}")
         result = _extract_json(raw)
         if result:
@@ -72,43 +103,55 @@ def _call_evaluator(system_prompt: str, user_content: str, label: str) -> dict |
         print(f"  [ERROR] {label}: {e}")
         return None
 
-# ── Evaluador principal ───────────────────────────────────────────────────────
 
-def evaluar_interaccion(mensaje_usuario: str, respuesta_aimo: str) -> dict | None:
+# ── Main evaluator ────────────────────────────────────────────────────────────
+
+def evaluar_interaccion(contexto_texto: str, clasificacion_texto: str) -> dict | None:
     """
-    Ejecuta 3 llamadas G-Eval independientes:
-      1. AERI (perspective_taking, fantasy, personal_distress)
-      2. Relevance
-      3. Semantically Appropriate
+    Runs 3 independent G-Eval calls using OpenAI GPT.
 
-    Devuelve un dict con todas las métricas + composite_score,
-    o None si todas las llamadas fallan.
+    Called ONLY when the final recommendations are generated.
 
-    Nota sobre empathic_concern (EC):
-    EC fue eliminada porque 'semantically_appropriate' es un superconjunto:
-    cubre la calidez y preocupación de EC, y además evalúa seguridad
-    psicológica y ausencia de positividad tóxica — haciendo EC redundante.
+    Parameters
+    ----------
+    contexto_texto : str
+        JSON string of the structured context from agente_contexto.
+    clasificacion_texto : str
+        JSON string of the risk classification from agente_clasificador.
+
+    Returns
+    -------
+    dict with all metrics + composite_score, or None if all calls fail.
     """
-    conversacion = (
-        f"Student: {mensaje_usuario}\n"
-        f"AIMO: {respuesta_aimo}"
+    # Combined input passed to every evaluator
+    contenido_eval = (
+        f"Contexto recopilado del estudiante:\n{contexto_texto}\n\n"
+        f"Clasificación de riesgo psicológico:\n{clasificacion_texto}"
     )
 
     # ── 1. AERI (PT, FT, PD) ─────────────────────────────────────────────────
-    aeri_prompt = _load_prompt('evaluador_v1.txt')
-    aeri_result = _call_evaluator(aeri_prompt, conversacion, "AERI (PT/FT/PD)")
+    aeri_prompt  = _load_prompt('evaluador_v1.txt')
+    aeri_result  = _call_evaluator(aeri_prompt, contenido_eval, "AERI (PT/FT/PD)")
 
     # ── 2. Relevance ──────────────────────────────────────────────────────────
     rel_prompt = _load_prompt('relevance_v1.txt')
-    rel_prompt_filled = rel_prompt.replace('{{User_Query}}', mensaje_usuario).replace('{{Model_Response}}', respuesta_aimo)
-    rel_result = _call_evaluator(rel_prompt_filled, conversacion, "Relevance")
+    rel_prompt_filled = (
+        rel_prompt
+        .replace('{{User_Query}}',     contexto_texto)
+        .replace('{{Model_Response}}', clasificacion_texto)
+    )
+    rel_result = _call_evaluator(rel_prompt_filled, contenido_eval, "Relevance")
 
     # ── 3. Semantically Appropriate ───────────────────────────────────────────
     sa_prompt = _load_prompt('semantically_appropriate_v1.txt')
-    sa_prompt_filled = sa_prompt.replace('{{User_Query}}', mensaje_usuario).replace('{{Model_Response}}', respuesta_aimo)
-    sa_result = _call_evaluator(sa_prompt_filled, conversacion, "Semantically Appropriate")
+    sa_prompt_filled = (
+        sa_prompt
+        .replace('{{User_Query}}',     contexto_texto)
+        .replace('{{Model_Response}}', clasificacion_texto)
+    )
+    sa_result = _call_evaluator(sa_prompt_filled, contenido_eval, "Semantically Appropriate")
 
-    # ── Combinar resultados ───────────────────────────────────────────────────
+    # ── Combine results ───────────────────────────────────────────────────────
     evaluation = {}
 
     if aeri_result:
@@ -127,34 +170,22 @@ def evaluar_interaccion(mensaje_usuario: str, respuesta_aimo: str) -> dict | Non
         return None
 
     # ── Composite score (weighted) ────────────────────────────────────────────
-    # Weights derived from:
-    # - Xu, Z., & Jiang, J. (2024). "Multi-dimensional Evaluation of Empathetic
-    #   Dialogue Responses." Findings of EMNLP 2024, pp. 2066-2087.
-    #   https://doi.org/10.18653/v1/2024.findings-emnlp.113
-    #   → Demonstrates that perspective-taking and cognitive engagement correlate
-    #     most strongly with dialogue satisfaction → highest weight (0.30).
-    # - Abd-Alrazaq, A. A., et al. (2020). "Effectiveness and Safety of Using
-    #   Chatbots to Improve Mental Health: Systematic Review and Meta-Analysis."
-    #   Journal of Medical Internet Research, 22(7), e16021.
-    #   https://doi.org/10.2196/16021
-    #   → Frames safety/appropriateness as primary evaluation criterion for
-    #     mental health chatbots → semantic_appropriate weighted above fantasy.
     METRIC_WEIGHTS = {
-        "perspective_taking":       0.30,
-        "personal_distress":        0.20,   # inverted: (6-PD) * weight
-        "relevance":                0.25,
-        "semantically_appropriate": 0.15,
-        "fantasy":                  0.10,
+        "perspective_taking":        0.30,
+        "personal_distress":         0.20,   # inverted: (6 - score) * weight
+        "relevance":                 0.25,
+        "semantically_appropriate":  0.15,
+        "fantasy":                   0.10,
     }
 
     pt  = evaluation.get('perspective_taking', {}).get('score')
-    ft  = evaluation.get('fantasy', {}).get('score')
-    pd_ = evaluation.get('personal_distress', {}).get('score')
-    rel = evaluation.get('relevance', {}).get('score')
+    ft  = evaluation.get('fantasy',            {}).get('score')
+    pd_ = evaluation.get('personal_distress',  {}).get('score')
+    rel = evaluation.get('relevance',          {}).get('score')
     sa  = evaluation.get('semantically_appropriate', {}).get('score')
 
-    weighted_sum  = 0.0
-    total_weight  = 0.0
+    weighted_sum = 0.0
+    total_weight = 0.0
 
     if pt  is not None:
         weighted_sum += pt  * METRIC_WEIGHTS["perspective_taking"]
@@ -173,8 +204,8 @@ def evaluar_interaccion(mensaje_usuario: str, respuesta_aimo: str) -> dict | Non
         total_weight += METRIC_WEIGHTS["semantically_appropriate"]
 
     composite = round(weighted_sum / total_weight, 2) if total_weight > 0 else None
-    evaluation['composite_score'] = composite
-    evaluation['weighting_scheme'] = 'xu2024_abdAlrazaq2020'
+    evaluation['composite_score']   = composite
+    evaluation['weighting_scheme']  = 'xu2024_abdAlrazaq2020'
 
     print(f"\n[evaluador] ✓ Composite score: {composite}/5")
     print(f"[evaluador] Métricas obtenidas: {list(evaluation.keys())}\n")

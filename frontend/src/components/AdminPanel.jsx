@@ -81,41 +81,25 @@ function EvalCard({ turn, evaluation, text }) {
   )
 }
 
-// ── Emotions tab ──────────────────────────────────────────────────────────────
+// ── Risk tab ──────────────────────────────────────────────────────────────────
 
-const EMOTION_COLORS = {
-  sadness:    'em-sadness',
-  anxiety:    'em-anxiety',
-  anger:      'em-anger',
-  overwhelm:  'em-overwhelm',
-  loneliness: 'em-loneliness',
-  neutral:    'em-neutral',
+const RISK_META = {
+  low:    { cls: 'risk-low',    label: 'BAJO',  emoji: '🟢' },
+  medium: { cls: 'risk-medium', label: 'MEDIO', emoji: '🟡' },
+  high:   { cls: 'risk-high',   label: 'ALTO',  emoji: '🔴' },
 }
 
-const EMOTION_EMOJI = {
-  sadness:    '💙',
-  anxiety:    '🟠',
-  anger:      '🔴',
-  overwhelm:  '💜',
-  loneliness: '🩶',
-  neutral:    '💚',
+const ACTION_META = {
+  continue: { cls: 'action-continue', label: 'CONTINUAR' },
+  caution:  { cls: 'action-caution',  label: 'PRECAUCIÓN' },
+  escalate: { cls: 'action-escalate', label: 'ESCALAR' },
 }
 
-function IntensityPips({ value }) {
-  return (
-    <div className="em-intensity">
-      {[1, 2, 3, 4, 5].map(i => (
-        <span key={i} className={`em-pip${i <= value ? ' em-pip-on' : ''}`} />
-      ))}
-      <span className="em-intensity-num">{value}/5</span>
-    </div>
-  )
-}
-
-function EmotionCard({ turn, classification, text }) {
+function RiskCard({ turn, classification, text }) {
   if (!classification) return null
-  const { emotion, intensity, crisis_signal, topic } = classification
-  const colorCls = EMOTION_COLORS[emotion] ?? 'em-neutral'
+  const { risk_level, signals = [], recommended_action } = classification
+  const risk   = RISK_META[risk_level]   ?? RISK_META.medium
+  const action = ACTION_META[recommended_action] ?? ACTION_META.caution
 
   return (
     <div className="ap-card">
@@ -125,29 +109,28 @@ function EmotionCard({ turn, classification, text }) {
 
       <div className="ap-card-hdr">
         <span className="ap-turn">TURNO {turn}</span>
-        {crisis_signal && (
-          <span className="em-crisis-badge">⚠ CRISIS SIGNAL</span>
-        )}
+        <span className={`em-badge ${action.cls}`}>{action.label}</span>
       </div>
 
       <div className="em-grid">
         <div className="em-field">
-          <span className="em-label">EMOCIÓN</span>
-          <span className={`em-badge ${colorCls}`}>
-            {EMOTION_EMOJI[emotion] ?? '●'} {emotion.toUpperCase()}
+          <span className="em-label">NIVEL DE RIESGO</span>
+          <span className={`em-badge ${risk.cls}`}>
+            {risk.emoji} {risk.label}
           </span>
         </div>
-
-        <div className="em-field">
-          <span className="em-label">INTENSIDAD</span>
-          <IntensityPips value={intensity} />
-        </div>
-
-        <div className="em-field">
-          <span className="em-label">TÓPICO</span>
-          <span className="em-topic">{topic.toUpperCase()}</span>
-        </div>
       </div>
+
+      {signals.length > 0 && (
+        <div className="em-signals">
+          <span className="em-label">SEÑALES DETECTADAS</span>
+          <ul className="em-signals-list">
+            {signals.map((s, i) => (
+              <li key={i} className="em-signal-item">» {s}</li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   )
 }
@@ -163,7 +146,7 @@ export default function AdminPanel({ messages, onClose }) {
     .map((m, i) => ({ turn: i + 1, evaluation: m.evaluation, text: m.text }))
     .filter(e => e.evaluation)
 
-  const emotions = aimoMessages
+  const risks = aimoMessages
     .map((m, i) => ({ turn: i + 1, classification: m.classification, text: m.text }))
     .filter(e => e.classification)
 
@@ -186,10 +169,10 @@ export default function AdminPanel({ messages, onClose }) {
             📊 MÉTRICAS {evals.length > 0 && `(${evals.length})`}
           </button>
           <button
-            className={`ap-tab${activeTab === 'emociones' ? ' ap-tab-active' : ''}`}
-            onClick={() => setActiveTab('emociones')}
+            className={`ap-tab${activeTab === 'riesgo' ? ' ap-tab-active' : ''}`}
+            onClick={() => setActiveTab('riesgo')}
           >
-            🧠 EMOCIONES {emotions.length > 0 && `(${emotions.length})`}
+            🔎 RIESGO {risks.length > 0 && `(${risks.length})`}
           </button>
         </div>
 
@@ -222,20 +205,20 @@ export default function AdminPanel({ messages, onClose }) {
             </>
           )}
 
-          {activeTab === 'emociones' && (
+          {activeTab === 'riesgo' && (
             <>
               <div className="ap-info-banner" style={{ marginTop: 0 }}>
-                <span>🧠 Clasificador emocional · Russell (1980) · Miller &amp; Rollnick (2012) · Beiter et al. (2015)</span>
+                <span>🔎 Clasificación de riesgo clínico · SPRC (2014) · WHO-DAS (2010) · aimo_classifier</span>
               </div>
 
-              {emotions.length === 0 ? (
+              {risks.length === 0 ? (
                 <div className="ap-empty">
-                  <span>🧠</span>
-                  <p>No hay clasificaciones aún.<br />Conversa con AIMO para ver<br />el estado emocional detectado.</p>
+                  <span>🔎</span>
+                  <p>La clasificación de riesgo<br />aparecerá al finalizar<br />la conversación.</p>
                 </div>
               ) : (
-                emotions.map(({ turn, classification, text }) => (
-                  <EmotionCard key={turn} turn={turn} classification={classification} text={text} />
+                risks.map(({ turn, classification, text }) => (
+                  <RiskCard key={turn} turn={turn} classification={classification} text={text} />
                 ))
               )}
             </>

@@ -1,61 +1,49 @@
 """
-Emotional State Classifier — AIMO pre-processor
-────────────────────────────────────────────────
-Makes ONE Groq call before generar_respuesta_aimo to classify the user's
-emotional state, intensity, crisis signal, and topic.
+Clinical Risk Classifier — AIMO pipeline
+─────────────────────────────────────────
+Receives the structured context JSON from agente_contexto and classifies the
+psychological risk level using prompts/aimo_classifier.txt.
+
+This replaces the previous per-message emotion classifier.  The new classifier
+performs a holistic, context-aware triage over the full gathered context.
 
 Theoretical basis:
-- Emotion taxonomy & prevalence in university students:
-  Sheldon, E., et al. (2021). "Prevalence and risk factors for mental health
-  problems in university undergraduate students: A systematic review with
-  meta-analysis." Journal of Affective Disorders, 287, 282-292.
-  https://doi.org/10.1016/j.jad.2021.03.054
-  → Validates depression, anxiety, loneliness, and related affective states
-    as the most prevalent emotional categories in undergraduate populations.
+- Conservative risk escalation heuristics:
+  Suicide Prevention Resource Center (2014). "Assessing and Managing Suicide
+  Risk: Core Competencies for Mental Health Professionals."
+  → Justifies the "when in doubt, escalate" decision rule used by the prompt.
 
-- Intensity-based response calibration:
-  Pedamallu, H., et al. (2022). "Technology-Delivered Adaptations of
-  Motivational Interviewing for the Prevention and Management of Chronic
-  Diseases: Scoping Review." Journal of Medical Internet Research, 24(8),
-  e35283. https://doi.org/10.2196/35283
-  → Justifies calibrating empathic response to emotional activation level:
-    reflective listening at high intensity, directive suggestions only when
-    the student is in a readiness state.
+- Functional impairment as triage criterion:
+  Üstün, T. B., et al. (2010). "Measuring health and disability: Manual for
+  WHO Disability Assessment Schedule." WHO Press.
+  → Frames daily-life functional impact as a primary severity indicator,
+    consistent with the LOW/MEDIUM/HIGH criteria in aimo_classifier.txt.
 """
 
-import json
+import os
 import re
+import json
 from src.config_api import get_groq_client, get_default_params
 
-_CLASSIFIER_SYSTEM_PROMPT = """\
-You are an emotional state classifier for a university student support chatbot.
-Analyze the student's message and respond ONLY with a JSON object in this exact format:
-{"emotion": "<sadness|anxiety|anger|overwhelm|loneliness|neutral>",
- "intensity": <1-5>,
- "crisis_signal": <true|false>,
- "topic": "<academic|social|family|identity|unknown>"}
 
-Rules:
-- emotion: choose the single most dominant affect
-- intensity: 1=barely present, 5=overwhelming
-- crisis_signal: true ONLY if there are explicit or strongly implied indicators
-  of self-harm, suicidal ideation, or acute safety risk
-- topic: primary life domain of the stressor
-No explanation, no preamble — JSON only."""
-
-_FALLBACK: dict = {
-    "emotion": "neutral",
-    "intensity": 2,
-    "crisis_signal": False,
-    "topic": "unknown",
-}
+def _load_prompt() -> str:
+    ruta = os.path.join(os.path.dirname(__file__), '..', 'prompts', 'aimo_classifier.txt')
+    try:
+        with open(ruta, 'r', encoding='utf-8') as f:
+            return f.read()
+    except FileNotFoundError:
+        print("[clasificador] ADVERTENCIA: No se encontró aimo_classifier.txt")
+        return ""
 
 
 def _extract_json(raw: str) -> dict | None:
-    """Extract the first valid JSON object from a string."""
+    """Extracts the first valid JSON object from a string."""
     if not raw:
         return None
+    # Remove markdown code fences
     raw = re.sub(r'```(?:json)?', '', raw).strip()
+    # Remove <think>...</think> reasoning blocks
+    raw = re.sub(r'<think>.*?</think>', '', raw, flags=re.DOTALL).strip()
     try:
         return json.loads(raw)
     except json.JSONDecodeError:
@@ -76,54 +64,57 @@ def _extract_json(raw: str) -> dict | None:
     return None
 
 
-def clasificar_estado_emocional(
-    mensaje_usuario: str,
-    historial_reciente: list,
-) -> dict:
-    """
-    Classifies the emotional state of the user message.
+_FALLBACK: dict = {
+    "risk_level": "medium",
+    "signals": ["información insuficiente para evaluación precisa"],
+    "recommended_action": "caution",
+}
 
-    Uses only the last 2 messages from history for context (not the full
-    history) to keep the call lightweight and focused on the current turn.
+
+def clasificar_riesgo(context_data: dict) -> dict:
+    """
+    Classifies the psychological risk level from the gathered context.
 
     Parameters
     ----------
-    mensaje_usuario : str
-        The user's current message.
-    historial_reciente : list
-        Full session history; only the last 2 entries are used.
+    context_data : dict
+        Structured context from agente_contexto.  Expected keys:
+        complete, history, background, beliefs, functional_impact,
+        previous_attempts.
 
     Returns
     -------
-    dict with keys: emotion, intensity, crisis_signal, topic.
-    Falls back to neutral defaults on any failure.
+    dict with keys: risk_level, signals, recommended_action.
+    Falls back to 'medium / caution' on any failure.
     """
     client = get_groq_client()
     params = get_default_params()
-    params["temperature"] = 0.1
-    params["max_completion_tokens"] = 600   # qwen3 uses <think> tokens before JSON
+    params["temperature"] = 0.1   # maximum consistency for triage
     params["stream"] = False
+    params["max_completion_tokens"] = 600
 
-    # Use only the last 2 messages for context (lightweight)
-    context_msgs = historial_reciente[-2:] if historial_reciente else []
+    system_prompt = _load_prompt()
+    if not system_prompt:
+        return _FALLBACK.copy()
 
-    messages = [{"role": "system", "content": _CLASSIFIER_SYSTEM_PROMPT}]
-    messages.extend(context_msgs)
-    messages.append({"role": "user", "content": mensaje_usuario})
+    # Strip internal 'complete' flag — not relevant for the classifier
+    context_for_classifier = {k: v for k, v in context_data.items() if k != 'complete'}
+    input_text = json.dumps(context_for_classifier, ensure_ascii=False, indent=2)
+
+    messages = [
+        {"role": "system", "content": system_prompt},
+        {"role": "user",   "content": input_text},
+    ]
 
     try:
         completion = client.chat.completions.create(messages=messages, **params)
-        raw = completion.choices[0].message.content
+        raw = completion.choices[0].message.content or ""
         result = _extract_json(raw)
 
-        if result and "emotion" in result and "intensity" in result:
-            result["crisis_signal"] = bool(result.get("crisis_signal", False))
-            result.setdefault("topic", "unknown")
+        if result and "risk_level" in result:
             print(
-                f"[clasificador] ✓ emotion={result['emotion']} "
-                f"intensity={result['intensity']} "
-                f"crisis={result['crisis_signal']} "
-                f"topic={result['topic']}"
+                f"[clasificador] ✓ risk_level={result['risk_level']} "
+                f"action={result.get('recommended_action')}"
             )
             return result
 
