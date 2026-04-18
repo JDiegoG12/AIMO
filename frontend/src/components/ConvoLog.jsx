@@ -20,7 +20,7 @@ function MsgBubble({ message }) {
         {cl && (
           <span
             className="msg-em-chip"
-            title={`${cl.emotion} · intensidad ${cl.intensity}/5${cl.crisis_signal ? ' · ⚠ crisis' : ''}`}
+            title={`${cl.emotion} · intensidad ${cl.intensity}/5${cl.crisis_signal ? ' ·  crisis' : ''}`}
           >
             {EMOTION_EMOJI[cl.emotion] ?? '●'} {cl.emotion}
           </span>
@@ -42,13 +42,11 @@ export default function ConvoLog({ messages, onReset, onClose }) {
 
   return (
     <div className="ap-overlay" onClick={onClose}>
-      <div className="ap-panel" onClick={e => e.stopPropagation()} role="dialog" aria-label="Historial de conversación">
-
-        {/* Header */}
+      <div className="ap-panel convo-panel" onClick={e => e.stopPropagation()} role="dialog" aria-label="Historial de conversación">
         <div className="ap-header">
-          <span className="ap-title">📜 HISTORIAL DE CONVERSACIÓN</span>
-          <div style={{ display: 'flex', gap: '8px' }}>
-            <button className="ap-close" onClick={onReset} style={{ borderColor: 'var(--yellow)', color: 'var(--yellow)' }}>
+          <span className="ap-title">HISTORIAL DE CONVERSACIÓN</span>
+          <div className="ap-header-actions">
+            <button className="ap-close ap-reset" onClick={onReset}>
               ↺ REINICIAR
             </button>
             <button className="ap-close" onClick={onClose} aria-label="Cerrar panel">✕</button>
@@ -56,18 +54,18 @@ export default function ConvoLog({ messages, onReset, onClose }) {
         </div>
 
         <div className="ap-info-banner">
-          <span>✦ Aquí puedes revisar todo lo que has hablado con AIMO.</span>
+          <span>Aquí puedes revisar todo lo que has hablado con AIMO.</span>
         </div>
 
         {/* Scrollable messages */}
         <div className="ap-body convo-scroll-modal" role="log" aria-live="polite">
           {messages.length === 0 ? (
             <div className="ap-empty">
-              <span>✦</span>
+              <span>•</span>
               <p>Escribe tu primer mensaje<br />para comenzar.</p>
             </div>
           ) : (
-            messages.map((msg, i) => <MsgBubble key={i} message={msg} />)
+            messages.map((msg, i) => <MessageItem key={i} message={msg} className="msg-log-item" />)
           )}
           <div ref={bottomRef} />
         </div>

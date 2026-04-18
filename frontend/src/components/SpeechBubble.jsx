@@ -1,24 +1,39 @@
 /**
- * SpeechBubble — Pixel-art RPG speech bubble.
- * Shows typewriter text with blinking cursor,
- * or animated dots while the agent is loading.
+ * SpeechBubble
+ *
+ * Muestra siempre el texto de presentación de AIMO quemado.
+ * Cuando la fase es "loading", superpone los tres puntos animados
+ * sobre el texto (no lo reemplaza) para indicar que AIMO está pensando.
+ *
+ * Props:
+ *   phase: string — fase actual del juego ("intro" | "user_turn" | "loading" | "responding")
  */
-export default function SpeechBubble({ text, isTyping, isLoading }) {
-  return (
-    <div className="speech-bubble-pixel" role="status" aria-live="polite">
-      {/* decorative star in corner */}
-      <span className="bubble-star" aria-hidden>⭐</span>
 
-      {isLoading ? (
-        <span className="loading-dots" aria-label="AIMO pensando">
-          <span>●</span><span>●</span><span>●</span>
+const STATIC_TEXT =
+  "¡Hola! Soy AIMO, tu compañero de apoyo emocional. Estoy aquí para escucharte sin juzgarte.";
+
+export default function SpeechBubble({ phase }) {
+  const isLoading = phase === "loading";
+
+  return (
+    <div
+      className={`speech-bubble-pixel${isLoading ? " bubble-thinking" : ""}`}
+      role="status"
+      aria-live="polite"
+    >
+      {/* Texto quemado: siempre visible */}
+      <span className={`bubble-static-text${isLoading ? " bubble-text-dimmed" : ""}`}>
+        {STATIC_TEXT}
+      </span>
+
+      {/* Overlay de puntos: solo visible cuando AIMO está pensando */}
+      {isLoading && (
+        <span className="bubble-loading-overlay" aria-label="AIMO pensando">
+          <span className="dot-pulse" />
+          <span className="dot-pulse" />
+          <span className="dot-pulse" />
         </span>
-      ) : (
-        <>
-          {text || '\u00A0'}
-          {isTyping && <span className="tw-cursor" aria-hidden />}
-        </>
       )}
     </div>
-  )
+  );
 }

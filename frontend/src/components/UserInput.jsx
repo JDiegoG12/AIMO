@@ -8,7 +8,7 @@ export default function UserInput({ enabled, complete, onSend }) {
     const el = textareaRef.current
     if (!el) return
     el.style.height = 'auto'
-    el.style.height = `${Math.min(el.scrollHeight, 96)}px`
+    el.style.height = `${Math.min(el.scrollHeight, 66)}px`
   },[])
 
   const handleChange = (e) => {
@@ -35,34 +35,30 @@ export default function UserInput({ enabled, complete, onSend }) {
       : 'AIMO está escribiendo...'
 
   return (
-    <div className={`user-input-row${enabled ? '' : ' input-locked'}${complete ? ' input-complete' : ''}`}>
-
-      {/* Pixel speech bubble tipo RPG — Sin colita */}
-      <div className={`user-pixel-bubble${enabled ? '' : ' bubble-disabled'}${complete ? ' bubble-complete' : ''}`}>
-        <div className="user-who-label">
-           <span className="user-who-dot" aria-hidden /> [ TÚ ]
-        </div>
+    <div className={`user-input-row${enabled ? '' : ' input-locked'}`}>
+      <div className="user-pixel-bubble">
+        <span className="user-who-label">[ TÚ ]</span>
         <textarea
           ref={textareaRef}
+          id="user-message-input"
           className="user-textarea"
           placeholder={placeholder}
           value={value}
           onChange={handleChange}
           onKeyDown={handleKey}
-          disabled={!enabled || complete}
-          rows={2}
+          disabled={!enabled}
+          rows={1}
           aria-label="Mensaje para AIMO"
         />
       </div>
 
-      {/* Send button */}
       <button
         className="send-btn"
         onClick={submit}
         disabled={!enabled || !value.trim() || complete}
         aria-label="Enviar"
       >
-        ENVIAR<br />►
+        ENVIAR
       </button>
     </div>
   )
