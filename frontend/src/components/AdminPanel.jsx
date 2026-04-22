@@ -10,7 +10,7 @@ import { useState, useEffect, useRef } from 'react'
 
 const METRICS = [
   { key: 'perspective_taking',       label: 'Perspective Taking',       abbr: 'PT',  cls: 'g', note: '',              invert: false },
-  { key: 'fantasy',                  label: 'Fantasy',                  abbr: 'FT',  cls: 'y', note: '',              invert: false },
+  { key: 'fantasy',                  label: 'Fantasy',                  abbr: 'FT',  cls: 'g', note: '',              invert: false },
   { key: 'personal_distress',        label: 'Personal Distress',        abbr: 'PD',  cls: 'r', note: '↓ menor=mejor', invert: true  },
   { key: 'relevance',                label: 'Relevance',                abbr: 'REL', cls: 'c', note: '',              invert: false },
   { key: 'semantically_appropriate', label: 'Semantically Approp.',     abbr: 'SA',  cls: 'c', note: '',              invert: false },
@@ -152,9 +152,7 @@ export default function AdminPanel({ messages, onClose }) {
 
   return (
     <div className="ap-overlay" onClick={onClose}>
-      <div className="ap-panel" onClick={e => e.stopPropagation()} role="dialog" aria-label="Panel de métricas">
-
-        {/* Header */}
+      <div className="ap-panel admin-panel" onClick={e => e.stopPropagation()} role="dialog" aria-label="Panel de métricas">
         <div className="ap-header">
           <span className="ap-title">⭐ PANEL ADMIN — INVESTIGACIÓN</span>
           <button className="ap-close" onClick={onClose} aria-label="Cerrar panel">✕</button>
@@ -176,7 +174,6 @@ export default function AdminPanel({ messages, onClose }) {
           </button>
         </div>
 
-        {/* Content */}
         <div className="ap-body">
 
           {activeTab === 'metricas' && (

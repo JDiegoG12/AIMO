@@ -1,193 +1,293 @@
-import { useState, useEffect, useRef } from 'react'
-import WorldBackground        from './components/WorldBackground'
-import AimoCharacter          from './components/AimoCharacter'
-import SpeechBubble           from './components/SpeechBubble'
-import ConvoLog               from './components/ConvoLog'
-import UserInput              from './components/UserInput'
-import AdminPanel             from './components/AdminPanel'
-import ThinkLog               from './components/ThinkLog'
-import RecommendationsModal   from './components/RecommendationsModal'
-import { useTypewriter } from './hooks/useTypewriter'
-import './App.css'
+/**
+ * App — Componente raíz de AIMO.
+ *
+ * Gestiona el flujo de fases de la conversación, el historial de mensajes,
+ * y los modales de investigación (AdminPanel, ThinkLog, RecommendationsModal).
+ *
+ * Fases:
+ *   intro      — pausa inicial antes de habilitar el input
+ *   user_turn  — esperando mensaje del usuario
+ *   loading    — petición en curso al backend
+ *   responding — AIMO escribiendo la respuesta (typewriter en chat)
+ *   complete   — pipeline finalizado, input deshabilitado
+ */
+import { useState, useEffect, useRef } from "react";
+import WorldBackground from "./components/WorldBackground";
+import AimoCharacter from "./components/AimoCharacter";
+import SpeechBubble from "./components/SpeechBubble";
+import MessageItem from "./components/MessageItem";
+import UserInput from "./components/UserInput";
+import AdminPanel from "./components/AdminPanel";
+import ThinkLog from "./components/ThinkLog";
+import RecommendationsModal from "./components/RecommendationsModal";
+import "./App.css";
 
-const PHASES = { INTRO:'intro', USER:'user_turn', LOAD:'loading', RESPOND:'responding' }
+const PHASES = {
+  INTRO:    "intro",
+  USER:     "user_turn",
+  LOAD:     "loading",
+  RESPOND:  "responding",
+  COMPLETE: "complete",
+};
 
-const GREETING = '¡Hola! Soy AIMO, tu compañero de apoyo emocional. Estoy aquí para escucharte sin juzgarte. ¿Qué te tiene rondando la cabeza hoy?'
+const USE_API = true;
 
-const USE_API = true
-
+/** Respuesta mock para desarrollo sin backend */
 function mockResponse() {
   return {
-    response: 'Escucho que estás cargando algo que pesa. No tienes que enfrentarlo solo. ¿Qué es lo que sientes con más fuerza ahora mismo?',
+    response:
+      "Escucho que estás cargando algo que pesa. No tienes que enfrentarlo solo. ¿Qué es lo que sientes con más fuerza ahora mismo?",
     evaluation: {
-      perspective_taking: { score: 4, justification: 'El agente refleja el estado emocional del usuario de forma contextualizada.' },
-      fantasy:            { score: 3, justification: 'La respuesta usa lenguaje empático funcional.' },
-      empathic_concern:   { score: 5, justification: '"No tienes que enfrentarlo solo" transmite calidez genuina.' },
-      personal_distress:  { score: 1, justification: 'El agente mantiene compostura total.' },
+      perspective_taking: {
+        score: 4,
+        justification:
+          "El agente refleja el estado emocional del usuario de forma contextualizada.",
+      },
+      fantasy: {
+        score: 3,
+        justification: "La respuesta usa lenguaje empático funcional.",
+      },
+      empathic_concern: {
+        score: 5,
+        justification:
+          '"No tienes que enfrentarlo solo" transmite calidez genuina.',
+      },
+      personal_distress: {
+        score: 1,
+        justification: "El agente mantiene compostura total.",
+      },
     },
-  }
+  };
 }
 
 export default function App() {
-  const [phase,            setPhase]            = useState(PHASES.INTRO)
-  const [messages,         setMessages]         = useState([])
-  const [adminOpen,        setAdminOpen]        = useState(false)
-  const [historyOpen,      setHistoryOpen]      = useState(false)
-  const [thinkOpen,        setThinkOpen]        = useState(false)
-  const [pipelineComplete, setPipelineComplete] = useState(false)
-  const [recsOpen,         setRecsOpen]         = useState(false)
-  const [finalRecs,        setFinalRecs]        = useState(null)
-  const sessionId = useRef(`s_${Date.now()}`)
-  const { displayed, isTyping, type } = useTypewriter()
+  // ── Estado de la conversación ──────────────────────────────────────────────
+  const [phase,          setPhase]          = useState(PHASES.INTRO);
+  const [messages,       setMessages]       = useState([]);
+  const [typingMsgIndex, setTypingMsgIndex] = useState(-1);
+
+  // ── Estado de modales ──────────────────────────────────────────────────────
+  const [adminOpen,        setAdminOpen]        = useState(false);
+  const [thinkOpen,        setThinkOpen]        = useState(false);
+  const [recsOpen,         setRecsOpen]         = useState(false);
+
+  // ── Estado del pipeline (añadido por compañeros) ───────────────────────────
+  /** Texto de las recomendaciones finales generadas al cerrar el pipeline */
+  const [finalRecs,        setFinalRecs]        = useState(null);
+  /** true cuando el backend indica que la conversación ha terminado */
+  const [pipelineComplete, setPipelineComplete] = useState(false);
+
+  // ── Refs ───────────────────────────────────────────────────────────────────
+  const sessionId      = useRef(`s_${Date.now()}`);
+  const convoBottomRef = useRef(null);
+
+  // ── Efectos ────────────────────────────────────────────────────────────────
+  useEffect(() => {
+    // Pausa breve de intro; la burbuja de AIMO es estática, no necesita typewriter
+    const t = setTimeout(() => setPhase(PHASES.USER), 600);
+    return () => clearTimeout(t);
+  }, []);
 
   useEffect(() => {
-    const t = setTimeout(() => {
-      type(GREETING, 28, () => setPhase(PHASES.USER))
-    }, 600)
-    return () => clearTimeout(t)
-  },[]) // eslint-disable-line
+    convoBottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, typingMsgIndex]);
+
+  // ── Handlers ───────────────────────────────────────────────────────────────
 
   const handleSend = async (userMsg) => {
-    setPhase(PHASES.LOAD)
-    type('Hmm... déjame pensar en eso...', 38)
-    setMessages(prev =>[...prev, { role: 'user', text: userMsg }])
+    setPhase(PHASES.LOAD);
+    setMessages((prev) => [...prev, { role: "user", text: userMsg }]);
 
     try {
-      let data
+      let data;
       if (USE_API) {
-        const res = await fetch('/api/chat', {
-          method:  'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body:    JSON.stringify({ message: userMsg, session_id: sessionId.current }),
-        })
-        if (!res.ok) throw new Error(`HTTP ${res.status}`)
-        data = await res.json()
+        const res = await fetch("/api/chat", {
+          method:  "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            message:    userMsg,
+            session_id: sessionId.current,
+          }),
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        data = await res.json();
       } else {
-        await new Promise(r => setTimeout(r, 1800))
-        data = mockResponse()
+        await new Promise((r) => setTimeout(r, 1800));
+        data = mockResponse();
       }
 
-      const isComplete = data.phase === 'complete'
-
-      setMessages(prev =>[...prev, {
-        role:           'aimo',
+      const newMsg = {
+        role:           "aimo",
         text:           data.response,
-        thinking:       data.thinking       ?? null,
         evaluation:     data.evaluation     ?? null,
-        classification: data.classification ?? null,
-      }])
+        classification: data.classification ?? null,  // clasificación de riesgo (compañeros)
+        thinking:       data.thinking       ?? null,  // cadena de pensamiento <think> (compañeros)
+      };
 
-      if (isComplete) {
-        // Final recommendations: show brief notice in bubble, open modal
-        setPipelineComplete(true)
-        setFinalRecs(data.response)
-        setPhase(PHASES.RESPOND)
-        type('He preparado unas recomendaciones para ti. Puedes verlas aquí ↑', 26, () => {
-          setPhase(PHASES.USER)
-          setRecsOpen(true)
-        })
-      } else {
-        setPhase(PHASES.RESPOND)
-        type(data.response, 26, () => setPhase(PHASES.USER))
+      setMessages((prev) => {
+        const next = [...prev, newMsg];
+        setTypingMsgIndex(next.length - 1);
+        return next;
+      });
+      setPhase(PHASES.RESPOND);
+
+      // Si el backend indica que el pipeline terminó (compañeros)
+      if (data.pipeline_complete) {
+        setFinalRecs(data.recommendations ?? null);
+        setPipelineComplete(true);
+        if (data.recommendations) setRecsOpen(true);
       }
 
     } catch (err) {
-      console.error('[AIMO]', err)
-      const errMsg = '¡Ups! Tuve un problema de conexión. ¿Puedes intentarlo de nuevo?'
-      setMessages(prev => [...prev, { role: 'aimo', text: errMsg }])
-      setPhase(PHASES.RESPOND)
-      type(errMsg, 28, () => setPhase(PHASES.USER))
+      console.error("[AIMO]", err);
+      const errMsg =
+        "¡Ups! Tuve un problema de conexión. ¿Puedes intentarlo de nuevo?";
+      setMessages((prev) => {
+        const next = [...prev, { role: "aimo", text: errMsg }];
+        setTypingMsgIndex(next.length - 1);
+        return next;
+      });
+      setPhase(PHASES.RESPOND);
     }
-  }
+  };
+
+  /** Llamado por MessageItem cuando termina su animación typewriter */
+  const handleTypingDone = () => {
+    setTypingMsgIndex(-1);
+    setPhase(pipelineComplete ? PHASES.COMPLETE : PHASES.USER);
+  };
 
   const handleReset = async () => {
     if (USE_API) {
       try {
-        await fetch('/api/reset', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+        await fetch("/api/reset", {
+          method:  "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ session_id: sessionId.current }),
-        })
-      } catch (_) {}
+        });
+      } catch (err) {
+        console.error("[AIMO reset]", err);
+      }
     }
-    sessionId.current = `s_${Date.now()}`
-    setMessages([])
-    setPipelineComplete(false)
-    setFinalRecs(null)
-    setRecsOpen(false)
-    setPhase(PHASES.INTRO)
-    setTimeout(() => type(GREETING, 28, () => setPhase(PHASES.USER)), 200)
-  }
+    sessionId.current = `s_${Date.now()}`;
+    setMessages([]);
+    setTypingMsgIndex(-1);
+    setFinalRecs(null);
+    setPipelineComplete(false);
+    setRecsOpen(false);
+    setPhase(PHASES.USER);
+  };
 
-  const evalCount  = messages.filter(m => m.role === 'aimo' && m.evaluation).length
-  const thinkCount = messages.filter(m => m.role === 'aimo' && m.thinking).length
+  const evalCount = messages.filter(
+    (m) => m.role === "aimo" && m.evaluation,
+  ).length;
 
+  const isComplete = phase === PHASES.COMPLETE || pipelineComplete;
+
+  // ── Render ─────────────────────────────────────────────────────────────────
   return (
     <div className="game-root">
-      <div className="scanlines" aria-hidden />
-
-      {/* ── Entorno de fondo ── */}
       <WorldBackground />
 
-      {/* ── Interfaz HUD Superior Derecha ── */}
-      <div className="top-right-hud">
-        <button
-          className="hud-btn"
-          onClick={() => setHistoryOpen(true)}
-          aria-label="Abrir historial"
-        >
-          <span className="admin-icon">📜</span>
-          <span className="admin-label">HISTORIAL</span>
-        </button>
-
-        <button
-          className="hud-btn"
-          onClick={() => setThinkOpen(true)}
-          aria-label="Ver cadena de pensamiento"
-        >
-          <span className="admin-icon">💭</span>
-          <span className="admin-label">PENSAMIENTO</span>
-          {thinkCount > 0 && <span className="admin-badge">{thinkCount}</span>}
-        </button>
-
-        <button
-          className="hud-btn"
-          onClick={() => setAdminOpen(true)}
-          aria-label="Panel de métricas AERI"
-        >
-          <span className="admin-icon">⭐</span>
-          <span className="admin-label">ADMIN</span>
-          {evalCount > 0 && <span className="admin-badge">{evalCount}</span>}
-        </button>
-      </div>
-
-      {/* ── Personaje AIMO centrado y su Globo de Diálogo ── */}
-      <div className={`character-col phase-${phase}`}>
-        <div className="speech-wrap-aimo">
-          <SpeechBubble
-            text={displayed}
-            isTyping={isTyping}
-            isLoading={phase === PHASES.LOAD}
-          />
+      {/* ── Header ── */}
+      <header className="app-header">
+        <div className="app-brand" aria-label="AIMO">
+          <span className="brand-pixel" aria-hidden />
+          <span className="brand-name">AIMO</span>
         </div>
-        <AimoCharacter phase={phase} />
-        <div className="aimo-ground-shadow" /> 
-      </div>
 
-      {/* ── Input del usuario (Caja estilo RPG inferior) ── */}
-      <div className="rpg-input-col">
+        <div className="top-right-hud">
+          <button
+            className="hud-btn"
+            onClick={handleReset}
+            aria-label="Reiniciar conversación"
+          >
+            <span className="admin-icon">↺</span>
+            <span className="admin-label">REINICIAR</span>
+          </button>
+
+          <button
+            className="hud-btn"
+            onClick={() => setThinkOpen(true)}
+            aria-label="Cadena de pensamiento"
+          >
+            <span className="admin-icon">💭</span>
+            <span className="admin-label">THINK</span>
+          </button>
+
+          <button
+            className="hud-btn"
+            onClick={() => setAdminOpen(true)}
+            aria-label="Panel de métricas AERI"
+          >
+            <span className="admin-icon">⭐</span>
+            <span className="admin-label">ADMIN</span>
+            {evalCount > 0 && <span className="admin-badge">{evalCount}</span>}
+          </button>
+        </div>
+      </header>
+
+      {/* ── Main: columna AIMO + columna chat ── */}
+      <main className="app-main">
+        <section className={`character-col phase-${phase}`}>
+          <div className="speech-wrap-aimo">
+            <SpeechBubble phase={phase} />
+          </div>
+          <AimoCharacter phase={phase} />
+          <p className="aimo-disclaimer">
+            AIMO puede cometer errores. Sus respuestas son orientativas y no reemplazan la atención de un profesional de salud mental.
+          </p>
+        </section>
+
+        <section className="chat-col">
+          <div className="chat-title">
+            <span className="chat-title-label">CONVERSACIÓN</span>
+            <span className="chat-title-disclaimer">
+              AIMO puede cometer errores · No reemplaza a un profesional
+            </span>
+          </div>
+          <div className="chat-scroll" role="log" aria-live="polite">
+            {messages.length === 0 ? (
+              <div className="chat-empty">AIMO está listo para escucharte.</div>
+            ) : (
+              messages.map((msg, i) => (
+                <MessageItem
+                  key={i}
+                  message={msg}
+                  isTyping={i === typingMsgIndex}
+                  onTypingDone={
+                    i === typingMsgIndex ? handleTypingDone : undefined
+                  }
+                />
+              ))
+            )}
+            {phase === PHASES.LOAD && (
+              <div className="msg-bubble-wrap wrap-aimo">
+                <div className="msg-pixel-bubble bubble-aimo typing-indicator">
+                  <span className="dot-pulse" />
+                  <span className="dot-pulse" />
+                  <span className="dot-pulse" />
+                </div>
+              </div>
+            )}
+            <div ref={convoBottomRef} />
+          </div>
+        </section>
+      </main>
+
+      {/* ── Footer: input del usuario ── */}
+      <footer className="rpg-input-col">
         <UserInput
-          enabled={phase === PHASES.USER && !pipelineComplete}
-          complete={pipelineComplete}
+          enabled={phase === PHASES.USER}
+          complete={isComplete}
           onSend={handleSend}
         />
-      </div>
+        <p className="footer-disclaimer">
+          AIMO puede cometer errores · No reemplaza a un profesional de salud mental
+        </p>
+      </footer>
 
-      {/* ── Modales ── */}
-      {historyOpen && (
-        <ConvoLog messages={messages} onReset={handleReset} onClose={() => setHistoryOpen(false)} />
-      )}
-
+      {/* ── Modales de investigación ── */}
       {thinkOpen && (
         <ThinkLog messages={messages} onClose={() => setThinkOpen(false)} />
       )}
@@ -197,15 +297,22 @@ export default function App() {
       )}
 
       {recsOpen && (
-        <RecommendationsModal text={finalRecs} onClose={() => setRecsOpen(false)} />
+        <RecommendationsModal
+          text={finalRecs}
+          onClose={() => setRecsOpen(false)}
+        />
       )}
 
-      {/* Button to reopen recommendations modal after closing */}
+      {/* Botón flotante para reabrir recomendaciones tras cerrar el modal */}
       {pipelineComplete && !recsOpen && (
-        <button className="rec-reopen-btn" onClick={() => setRecsOpen(true)} aria-label="Ver recomendaciones">
+        <button
+          className="rec-reopen-btn"
+          onClick={() => setRecsOpen(true)}
+          aria-label="Ver recomendaciones"
+        >
           ★ VER RECOMENDACIONES
         </button>
       )}
     </div>
-  )
+  );
 }
