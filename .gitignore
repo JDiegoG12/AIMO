@@ -43,3 +43,5 @@ Thumbs.db
 # OPTIONAL (recomendado)
 # =========================
 .github/
+
+.src/__pycache__/
