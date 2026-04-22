@@ -107,26 +107,27 @@ def chat():
     # 2. Final personalized recommendations
     recomendaciones = generar_recomendaciones(context_data, clasificacion)
 
-    # 3. Evaluation via OpenAI (only at this final stage)
+    # 3. Evaluation via OpenAI (only for low/medium risk — high just redirects)
     evaluacion = None
-    try:
-        context_str      = json.dumps(
-            {k: v for k, v in context_data.items() if k != 'complete'},
-            ensure_ascii=False,
-        )
-        clasificacion_str = json.dumps(clasificacion, ensure_ascii=False)
-        raw_eval = evaluar_interaccion(context_str, clasificacion_str)
+    if clasificacion.get("risk_level") != "high":
+        try:
+            context_str = json.dumps(
+                {k: v for k, v in context_data.items() if k != 'complete'},
+                ensure_ascii=False,
+            )
+            clasificacion_str = json.dumps(clasificacion, ensure_ascii=False)
+            raw_eval = evaluar_interaccion(context_str, clasificacion_str, recomendaciones)
 
-        if isinstance(raw_eval, dict):
-            evaluacion = raw_eval
-        elif isinstance(raw_eval, str):
-            start = raw_eval.find("{")
-            end   = raw_eval.rfind("}") + 1
-            if start != -1 and end > start:
-                evaluacion = json.loads(raw_eval[start:end])
-    except Exception as e:
-        print(f"[api] Error en evaluación: {e}")
-        evaluacion = None  # Non-fatal: UI handles missing evaluation gracefully
+            if isinstance(raw_eval, dict):
+                evaluacion = raw_eval
+            elif isinstance(raw_eval, str):
+                start = raw_eval.find("{")
+                end   = raw_eval.rfind("}") + 1
+                if start != -1 and end > start:
+                    evaluacion = json.loads(raw_eval[start:end])
+        except Exception as e:
+            print(f"[api] Error en evaluación: {e}")
+            evaluacion = None  # Non-fatal: UI handles missing evaluation gracefully
 
     # Mark session as complete
     session["phase"] = "complete"

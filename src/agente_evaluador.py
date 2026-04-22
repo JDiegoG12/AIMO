@@ -26,7 +26,7 @@ import re
 from src.config_api import get_openai_client
 
 # OpenAI model used for all evaluation calls
-OPENAI_EVAL_MODEL = "gpt-4o-mini"
+OPENAI_EVAL_MODEL = "gpt-4"
 
 
 # ── Helpers ──────────────────────────────────────────────────────────────────
@@ -106,11 +106,15 @@ def _call_evaluator(system_prompt: str, user_content: str, label: str) -> dict |
 
 # ── Main evaluator ────────────────────────────────────────────────────────────
 
-def evaluar_interaccion(contexto_texto: str, clasificacion_texto: str) -> dict | None:
+def evaluar_interaccion(
+    contexto_texto: str,
+    clasificacion_texto: str,
+    recomendaciones_texto: str = "",
+) -> dict | None:
     """
     Runs 3 independent G-Eval calls using OpenAI GPT.
 
-    Called ONLY when the final recommendations are generated.
+    Called ONLY when the final recommendations are generated (low/medium risk).
 
     Parameters
     ----------
@@ -118,15 +122,21 @@ def evaluar_interaccion(contexto_texto: str, clasificacion_texto: str) -> dict |
         JSON string of the structured context from agente_contexto.
     clasificacion_texto : str
         JSON string of the risk classification from agente_clasificador.
+    recomendaciones_texto : str
+        Final recommendations text shown to the student. Used as the evaluated
+        model response in the Relevance and Semantically Appropriate metrics.
 
     Returns
     -------
     dict with all metrics + composite_score, or None if all calls fail.
     """
-    # Combined input passed to every evaluator
+    model_response = recomendaciones_texto or clasificacion_texto
+
+    # Combined input passed to every evaluator (includes the actual response)
     contenido_eval = (
         f"Contexto recopilado del estudiante:\n{contexto_texto}\n\n"
-        f"Clasificación de riesgo psicológico:\n{clasificacion_texto}"
+        f"Clasificación de riesgo psicológico:\n{clasificacion_texto}\n\n"
+        f"Respuesta del asistente (recomendaciones mostradas al estudiante):\n{model_response}"
     )
 
     # ── 1. AERI (PT, FT, PD) ─────────────────────────────────────────────────
@@ -138,7 +148,7 @@ def evaluar_interaccion(contexto_texto: str, clasificacion_texto: str) -> dict |
     rel_prompt_filled = (
         rel_prompt
         .replace('{{User_Query}}',     contexto_texto)
-        .replace('{{Model_Response}}', clasificacion_texto)
+        .replace('{{Model_Response}}', model_response)
     )
     rel_result = _call_evaluator(rel_prompt_filled, contenido_eval, "Relevance")
 
@@ -147,7 +157,7 @@ def evaluar_interaccion(contexto_texto: str, clasificacion_texto: str) -> dict |
     sa_prompt_filled = (
         sa_prompt
         .replace('{{User_Query}}',     contexto_texto)
-        .replace('{{Model_Response}}', clasificacion_texto)
+        .replace('{{Model_Response}}', model_response)
     )
     sa_result = _call_evaluator(sa_prompt_filled, contenido_eval, "Semantically Appropriate")
 
