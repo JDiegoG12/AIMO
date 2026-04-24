@@ -1,0 +1,231 @@
+{
+  "session_id": "s_1777003346251",
+  "inicio": "2026-04-24T04:02:40.543447+00:00",
+  "fin": "2026-04-24T04:13:34.265514+00:00",
+  "duracion_segundos": 653,
+  "total_turnos": 5,
+  "fase_final": "complete",
+  "turnos": [
+    {
+      "numero": 1,
+      "timestamp": "2026-04-24T04:02:47.124306+00:00",
+      "fase": "gathering",
+      "usuario": "hola, me siento triste y con rabia, mi problema principal es que mi padre le pega a mi madre y no se como responder, no se si demandar o responder fisicamente, es un problema familiar mas que todo pero tambien afecta en mi rendimiento academico un poco porlo que me siento triste, pienso que deberia de ir a demandar pero aun tengo miedo, tambien es porque en mis creencias debo responder fisicamente, he intentado hacer ejercicios de retroinspeccion para tener la valentia de ir a demandar y le he contado a mi mejor amigo para sentirme mejor,\n, tengo miedo que mi padre le haga más daño a mi madre, he hablado con ella pero dice que prefiere aguantarlo y que lo deje, obviamente se siente mal pero por alguna razon no quiere salir, cuando me dice que lo deje siento desesperación",
+      "asistente": "Entiendo que estás pasando por un momento muy difícil y doloroso. La situación con tu padre y tu madre es muy complicada y puede ser muy estresante para ti. Es comprensible que te sientas triste y con rabia al mismo tiempo. Me parece que estás intentando encontrar una forma de ayudar a tu madre, pero también estás atrapado en tus propias creencias y miedos. ¿Puedes decirme más sobre lo que te hace sentir que debes responder físicamente a la situación? ¿Es algo que has aprendido en tu familia o en tu entorno?",
+      "context_snapshot": {
+        "complete": false,
+        "history": "problema familiar de violencia domestica",
+        "background": "padre pega a la madre",
+        "beliefs": "debe responder fisicamente",
+        "functional_impact": "afecta rendimiento academico y bienestar emocional",
+        "previous_attempts": "ejercicios de retroinspeccion y hablar con amigo",
+        "emotion": "sadness",
+        "intensity": 4,
+        "topic": "family",
+        "crisis_signal": false
+      },
+      "evaluacion_intermedia": {
+        "empatia": {
+          "score": 5,
+          "justificacion": "Reconoce emociones complejas y muestra comprensión genuina."
+        },
+        "naturalidad": {
+          "score": 5,
+          "justificacion": "Respuesta fluida y empática, sin sonar forzada."
+        },
+        "adecuacion_pregunta": {
+          "score": 5,
+          "justificacion": "Pregunta relevante que profundiza en el origen de sus creencias."
+        },
+        "score_promedio": 5.0
+      },
+      "tokens_estimados": 1284
+    },
+    {
+      "numero": 2,
+      "timestamp": "2026-04-24T04:07:35.263346+00:00",
+      "fase": "gathering",
+      "usuario": "puede ser algo que aprendi de mi padre, pero no lo se",
+      "asistente": "Es posible que hayas internalizado algunas de las actitudes y comportamientos de tu padre sin darte cuenta. A veces, las cosas que aprendemos en nuestra infancia pueden influir en nuestras creencias y comportamientos de manera profunda. Me parece que estás empezando a cuestionar algunas de estas creencias y a buscar otras formas de abordar la situación. ¿Te sientes como si estuvieras atrapado entre la lealtad a tu padre y el deseo de proteger a tu madre?",
+      "context_snapshot": {
+        "complete": false,
+        "history": "problema principal es que mi padre le pega a mi madre",
+        "background": "familia con violencia domestica",
+        "beliefs": "creencias de responder fisicamente",
+        "functional_impact": "afecta rendimiento academico y emocional",
+        "previous_attempts": "ejercicios de retroinspeccion y hablar con amigo",
+        "emotion": "sadness",
+        "intensity": 4,
+        "topic": "family",
+        "crisis_signal": false
+      },
+      "evaluacion_intermedia": {
+        "empatia": {
+          "score": 5,
+          "justificacion": "Reconoce la posible influencia del padre y la lucha interna del estudiante."
+        },
+        "naturalidad": {
+          "score": 5,
+          "justificacion": "Respuesta fluida y empática, sin sonar forzada."
+        },
+        "adecuacion_pregunta": {
+          "score": 5,
+          "justificacion": "Formula una pregunta relevante que profundiza en la situación emocional."
+        },
+        "score_promedio": 5.0
+      },
+      "tokens_estimados": 1459
+    },
+    {
+      "numero": 3,
+      "timestamp": "2026-04-24T04:08:31.662398+00:00",
+      "fase": "gathering",
+      "usuario": "no, que le den por el culo a mi padre, solo quiero proteger a mi madre",
+      "asistente": "Entiendo que tu prioridad es proteger a tu madre y que estás muy preocupado por su bienestar. Es completamente comprensible que sientas esa rabia y frustración hacia tu padre. Me parece que estás buscando una forma de hacer que la situación cambie y que tu madre esté a salvo. ¿Te sientes como si estuvieras solo en esta lucha, o hay alguien más en tu familia o en tu entorno que te esté apoyando en este momento?",
+      "context_snapshot": {
+        "complete": false,
+        "history": "problema familiar de violencia domestica",
+        "background": "padre agresivo, madre victima",
+        "beliefs": "deberia proteger a mi madre",
+        "functional_impact": "afecta rendimiento academico y bienestar emocional",
+        "previous_attempts": "ejercicios de retroinspeccion, hablar con amigo",
+        "emotion": "anger",
+        "intensity": 4,
+        "topic": "family",
+        "crisis_signal": false
+      },
+      "evaluacion_intermedia": {
+        "empatia": {
+          "score": 5,
+          "justificacion": "Reconoce la rabia y frustración del estudiante, valida su preocupación por su madre"
+        },
+        "naturalidad": {
+          "score": 5,
+          "justificacion": "Respuesta fluida y empática, sin sonar forzada"
+        },
+        "adecuacion_pregunta": {
+          "score": 5,
+          "justificacion": "Formula una pregunta pertinente que amplía la comprensión emocional"
+        },
+        "score_promedio": 5.0
+      },
+      "tokens_estimados": 1580
+    },
+    {
+      "numero": 4,
+      "timestamp": "2026-04-24T04:12:48.240108+00:00",
+      "fase": "gathering",
+      "usuario": "brother me siento solo porque no tengo hermanos",
+      "asistente": "Entiendo que te sientes solo en este momento, y que no tener hermanos puede hacer que te sientas como si no tuvieras a nadie con quien compartir esta carga. Pero quiero que sepas que no estás solo, hay personas que se preocupan por ti y que quieren ayudarte. Me alegra que hayas hablado con tu mejor amigo sobre esto, eso es un gran paso. ¿Te gustaría hablar un poco más sobre cómo te sientes cuando estás con tu amigo, o si hay algo que te hace sentir un poco mejor en estos momentos?",
+      "context_snapshot": {
+        "complete": false,
+        "history": "problema familiar de violencia domestica",
+        "background": "padre agrede a la madre, madre prefiere aguantar",
+        "beliefs": "deberia responder fisicamente, pero tiene miedo",
+        "functional_impact": "afecta el rendimiento academico y la salud mental",
+        "previous_attempts": "ha intentado hacer ejercicios de retroinspeccion y hablar con un amigo",
+        "emotion": "sadness",
+        "intensity": 4,
+        "topic": "family",
+        "crisis_signal": false
+      },
+      "evaluacion_intermedia": {
+        "empatia": {
+          "score": 5,
+          "justificacion": "Reconoce la soledad del estudiante y le brinda apoyo emocional"
+        },
+        "naturalidad": {
+          "score": 3,
+          "justificacion": "Respuesta algo larga pero con empatía genuina"
+        },
+        "adecuacion_pregunta": {
+          "score": 3,
+          "justificacion": "Realiza una pregunta pertinente para profundizar en el tema"
+        },
+        "score_promedio": 3.7
+      },
+      "tokens_estimados": 1665
+    },
+    {
+      "numero": 5,
+      "timestamp": "2026-04-24T04:13:22.610825+00:00",
+      "fase": "gathering",
+      "usuario": "no no quiero seguir",
+      "asistente": "Entiendo, no hay problema. Me parece que has compartido mucho conmigo y que estás sintiendo un poco de agotamiento emocional. Quiero que sepas que estoy aquí para escucharte y apoyarte, pero también respeto tu decisión de no seguir hablando sobre esto por ahora. Espero que te sientas un poco mejor con el tiempo y que encuentres la forma de proteger a tu madre y a ti mismo. Cuídate mucho y no dudes en hablar con alguien si necesitas ayuda.",
+      "context_snapshot": {
+        "complete": true,
+        "history": "problema familiar con padre que le pega a la madre",
+        "background": "familia disfuncional",
+        "beliefs": "creencias de responder fisicamente",
+        "functional_impact": "afecta el rendimiento academico",
+        "previous_attempts": "hablar con el amigo y hacer ejercicios de retroinspeccion",
+        "emotion": "sadness",
+        "intensity": 5,
+        "topic": "family",
+        "crisis_signal": false
+      },
+      "evaluacion_intermedia": {
+        "empatia": {
+          "score": 5,
+          "justificacion": "Reconoce agotamiento emocional y ofrece apoyo genuino"
+        },
+        "naturalidad": {
+          "score": 5,
+          "justificacion": "Respuesta fluida y empática"
+        },
+        "adecuacion_pregunta": {
+          "score": 5,
+          "justificacion": "No realiza pregunta, respeta decisión del estudiante"
+        },
+        "score_promedio": 5.0
+      },
+      "tokens_estimados": 1828
+    }
+  ],
+  "clasificacion": {
+    "risk_level": "medium",
+    "signals": [
+      "familia disfuncional",
+      "creencias de responder fisicamente",
+      "afecta el rendimiento academico"
+    ],
+    "recommended_action": "caution"
+  },
+  "recomendaciones": "Entiendo que estás pasando por un momento difícil debido a la situación familiar y cómo esto está impactando tu rendimiento académico.\n\n1. Considera buscar actividades que te ayuden a canalizar tu tristeza y frustración de manera positiva, como el deporte o la escritura.\n2. Reflexiona sobre tus creencias de responder físicamente y explora alternativas más saludables para manejar la ira y el dolor.\n3. Habla con un profesor o consejero académico sobre tus dificultades para encontrar apoyo y flexibilidad en tus estudios.\n4. Continúa compartiendo tus sentimientos con tu amigo de confianza y considera unirte a un grupo de apoyo para estudiantes con experiencias similares.\n\n---\nRecuerda que no tienes que atravesar esto solo/a. El psicólogo de la Universidad del Cauca está disponible para acompañarte de forma confidencial y sin juicios. Puedes agendar una cita en: https://portal.unicauca.edu.co/versionP/bienestar-universitario/salud-para-estudiantes/psicologia-y-psiquiatria\n---",
+  "evaluacion_final": {
+    "perspective_taking": {
+      "score": 5,
+      "justification": "The assistant accurately reflects the user's unique emotional state by acknowledging the difficult family situation and its impact on academic performance."
+    },
+    "fantasy": {
+      "score": 3,
+      "justification": "The assistant provides functional but conventional advice, such as channeling emotions through activities and seeking support from a counselor or support group."
+    },
+    "personal_distress": {
+      "score": 1,
+      "justification": "The assistant maintains total composure, providing calm and composed advice without any signs of discomfort or reactivity."
+    },
+    "relevance": {
+      "score": 4,
+      "justification": "AIMO addresses the student's specific situation by acknowledging the family issue and its impact on academic performance. It also provides tailored advice such as reflecting on physical response beliefs and seeking support from a university counselor. However, it misses addressing the student's previous attempts."
+    },
+    "semantically_appropriate": {
+      "score": 4,
+      "justification": "AIMO's response is safe and empathetic, acknowledging the student's difficult family situation and its impact on their academic performance. It provides constructive suggestions for managing emotions and seeking support, but it could have addressed the physical violence issue more directly."
+    },
+    "composite_score": 4.4,
+    "weighting_scheme": "xu2024_abdAlrazaq2020"
+  },
+  "metadata": {
+    "modelos": {
+      "contexto": "llama-3.3-70b-versatile",
+      "clasificador": "llama-3.3-70b-versatile",
+      "recomendaciones_low": "llama-3.3-70b-versatile",
+      "recomendaciones_med": "bedrock/configured-via-env",
+      "evaluador_intermedio": "gpt-3.5-turbo",
+      "evaluador_final": "gpt-4"
+    },
+    "compresion_activada": false,
+    "evaluacion_intermedia_habilitada": true
+  }
+}

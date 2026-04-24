@@ -7,16 +7,16 @@ Generates personalized, empathetic recommendations for the student based on:
 
 Routing by risk level:
   - LOW    → Groq LLaMA (llama-3.3-70b-versatile)
-  - MEDIUM → AWS Bedrock (Claude Sonnet 4.5)
+  - MEDIUM → AWS Bedrock (configured via BEDROCK_MODEL_ID)
   - HIGH   → Groq LLaMA, brief message directing to university appointment page
-
-Uses prompts/aimo_recommendations.txt as system prompt (low/medium only).
-This is the last agent in the pipeline and its output is shown directly to the student.
 """
 
 import os
 import json
 from src.config_api import get_groq_client, get_default_params, get_bedrock_client
+from src.logger import get_logger
+
+logger = get_logger("aimo.recomendaciones")
 
 UNIVERSITY_APPT_URL = (
     "https://portal.unicauca.edu.co/versionP/bienestar-universitario/"
@@ -34,7 +34,7 @@ def _load_prompt() -> str:
         with open(ruta, 'r', encoding='utf-8') as f:
             return f.read()
     except FileNotFoundError:
-        print("[recomendaciones] ADVERTENCIA: No se encontró aimo_recommendations.txt")
+        logger.warning("No se encontró aimo_recommendations.txt — usando prompt mínimo")
         return (
             "Eres un asistente de apoyo emocional para estudiantes universitarios. "
             "Genera recomendaciones empáticas y personalizadas en español."
@@ -43,11 +43,10 @@ def _load_prompt() -> str:
 
 def _build_input(context_data: dict, clasificacion: dict) -> str:
     context_clean = {k: v for k, v in context_data.items() if k != 'complete'}
-    input_data = {
-        "context_summary": context_clean,
-        "risk_assessment":  clasificacion,
-    }
-    return json.dumps(input_data, ensure_ascii=False, indent=2)
+    return json.dumps(
+        {"context_summary": context_clean, "risk_assessment": clasificacion},
+        ensure_ascii=False, indent=2,
+    )
 
 
 def _generar_via_groq(system_prompt: str, input_text: str) -> str:
@@ -65,7 +64,6 @@ def _generar_via_groq(system_prompt: str, input_text: str) -> str:
 
 
 def _generar_via_bedrock(system_prompt: str, input_text: str) -> str:
-    # Uses the Bedrock Converse API — works with any model (Nova, Llama, Mistral, Anthropic)
     client = get_bedrock_client()
     response = client.converse(
         modelId=BEDROCK_MODEL_ID,
@@ -77,25 +75,22 @@ def _generar_via_bedrock(system_prompt: str, input_text: str) -> str:
 
 
 def _generar_riesgo_alto(context_data: dict, clasificacion: dict) -> str:
-    """
-    For HIGH risk: use Groq to generate a brief empathetic message that
-    urgently directs the student to book an appointment. No recommendations.
-    """
     context_clean = {k: v for k, v in context_data.items() if k != 'complete'}
     system = (
         "Eres un asistente de apoyo emocional para estudiantes universitarios. "
         "El estudiante está atravesando una situación emocionalmente grave. "
         "Escribe un mensaje MUY BREVE (máximo 3 oraciones) en español que: "
-        "1. Reconozca con calidez lo difícil de su situación, mencionando un detalle específico que compartió. "
+        "1. Reconozca con calidez lo difícil de su situación, mencionando un detalle específico. "
         "2. Le diga de forma directa y tranquilizadora que debe hablar con un profesional hoy. "
         "No hagas recomendaciones de autocuidado. No uses términos clínicos. "
         "Solo el mensaje de texto, sin JSON ni etiquetas."
     )
-    user_msg = json.dumps({
-        "context_summary": context_clean,
-        "risk_assessment": clasificacion,
-    }, ensure_ascii=False, indent=2)
+    user_msg = json.dumps(
+        {"context_summary": context_clean, "risk_assessment": clasificacion},
+        ensure_ascii=False, indent=2,
+    )
 
+    opening = "Lo que estás viviendo es muy difícil, y mereces apoyo real ahora mismo."
     try:
         client = get_groq_client()
         params = get_default_params()
@@ -111,8 +106,7 @@ def _generar_riesgo_alto(context_data: dict, clasificacion: dict) -> str:
         )
         opening = (completion.choices[0].message.content or "").strip()
     except Exception as e:
-        print(f"[recomendaciones] ✗ Error generando apertura para riesgo alto: {e}")
-        opening = "Lo que estás viviendo es muy difícil, y mereces apoyo real ahora mismo."
+        logger.error("Error generando mensaje riesgo alto: %s", e)
 
     return (
         f"{opening}\n\n"
@@ -124,47 +118,35 @@ def _generar_riesgo_alto(context_data: dict, clasificacion: dict) -> str:
 
 def generar_recomendaciones(context_data: dict, clasificacion: dict) -> str:
     """
-    Generates the final personalized recommendations for the student.
-
-    Routes to different backends depending on risk level:
-      - low    → Groq LLaMA
-      - medium → AWS Bedrock (Claude Sonnet 4.5)
-      - high   → Groq LLaMA, appointment redirect (no recommendations)
-
-    Parameters
-    ----------
-    context_data : dict
-        Structured context from agente_contexto.
-    clasificacion : dict
-        Risk classification from agente_clasificador.
-
-    Returns
-    -------
-    str — Text to display to the student.
+    Generates final personalized recommendations routed by risk level:
+      low    → Groq LLaMA
+      medium → AWS Bedrock
+      high   → Groq LLaMA, appointment redirect only
     """
     risk_level = clasificacion.get("risk_level", "medium")
-    print(f"[recomendaciones] Nivel de riesgo: {risk_level}")
+    logger.info("Generando recomendaciones — risk_level=%s", risk_level)
 
     if risk_level == "high":
         response = _generar_riesgo_alto(context_data, clasificacion)
-        print(f"[recomendaciones] ✓ Respuesta riesgo alto ({len(response)} chars)")
+        logger.info("Respuesta riesgo alto generada (%d chars)", len(response))
         return response
 
     system_prompt = _load_prompt()
-    input_text = _build_input(context_data, clasificacion)
+    input_text    = _build_input(context_data, clasificacion)
 
     try:
         if risk_level == "low":
             response = _generar_via_groq(system_prompt, input_text)
-        else:  # medium
+            backend = "Groq"
+        else:
             response = _generar_via_bedrock(system_prompt, input_text)
+            backend = "Bedrock"
 
-        print(f"[recomendaciones] ✓ Respuesta generada vía "
-              f"{'Groq' if risk_level == 'low' else 'Bedrock'} ({len(response)} chars)")
+        logger.info("Recomendaciones generadas vía %s (%d chars)", backend, len(response))
         return response
 
     except Exception as e:
-        print(f"[recomendaciones] ✗ Error ({risk_level}): {e}")
+        logger.error("Error generando recomendaciones (%s): %s", risk_level, e)
         return (
             "Gracias por compartir conmigo cómo te sientes. "
             "Te recomiendo hablar con el psicólogo de la Universidad del Cauca: "

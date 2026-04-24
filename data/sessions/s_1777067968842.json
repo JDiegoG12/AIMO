@@ -1,0 +1,208 @@
+{
+  "session_id": "s_1777067968842",
+  "inicio": "2026-04-24T22:00:53.316533+00:00",
+  "fin": "2026-04-24T22:13:46.939198+00:00",
+  "duracion_segundos": 773,
+  "total_turnos": 5,
+  "fase_final": "complete",
+  "turnos": [
+    {
+      "numero": 1,
+      "timestamp": "2026-04-24T22:01:00.468434+00:00",
+      "fase": "gathering",
+      "usuario": "me siento muy mal, ninguno de mis padres me quiere, me entere que soy adoptada y que solo me adoptaron porque querian mejorar su relacion y no porque en realidad me quieran, quiero acabar con mi vida, estoy en lo más alto de un edificio",
+      "asistente": "Es importante que te cuides y busques ayuda. Hay personas que se preocupan por ti y quieren ayudarte.",
+      "context_snapshot": {
+        "complete": false,
+        "history": "",
+        "background": "",
+        "beliefs": "",
+        "functional_impact": "",
+        "previous_attempts": "",
+        "emotion": "sadness",
+        "intensity": 5,
+        "topic": "family",
+        "crisis_signal": true
+      },
+      "evaluacion_intermedia": {
+        "empatia": {
+          "score": 3,
+          "justificacion": "Reconoce la situación emocional del estudiante, pero con mensaje genérico"
+        },
+        "naturalidad": {
+          "score": 4,
+          "justificacion": "Suena natural y empático en la respuesta"
+        },
+        "adecuacion_pregunta": {
+          "score": 1,
+          "justificacion": "No hace ninguna pregunta, podría haber indagado más sobre su situación"
+        },
+        "score_promedio": 2.7
+      },
+      "tokens_estimados": 1044
+    },
+    {
+      "numero": 2,
+      "timestamp": "2026-04-24T22:02:57.702685+00:00",
+      "fase": "gathering",
+      "usuario": "¿por que? no hay nadie que me quiera",
+      "asistente": "Lo siento mucho, eso debe ser muy doloroso para ti. Es importante que sepas que hay personas que pueden ayudarte, como profesionales de la salud mental o líneas de ayuda de crisis. No estás solo en esto.",
+      "context_snapshot": {
+        "complete": false,
+        "history": "problema de abandono y rechazo familiar",
+        "background": "adopción y relación familiar problemática",
+        "beliefs": "",
+        "functional_impact": "",
+        "previous_attempts": "",
+        "emotion": "sadness",
+        "intensity": 5,
+        "topic": "family",
+        "crisis_signal": true
+      },
+      "evaluacion_intermedia": {
+        "empatia": {
+          "score": 5,
+          "justificacion": "Reconoce el dolor y ofrece apoyo emocional"
+        },
+        "naturalidad": {
+          "score": 5,
+          "justificacion": "Respuesta fluida y empática"
+        },
+        "adecuacion_pregunta": {
+          "score": 5,
+          "justificacion": "No realiza pregunta, ofrece apoyo"
+        },
+        "score_promedio": 5.0
+      },
+      "tokens_estimados": 1207
+    },
+    {
+      "numero": 3,
+      "timestamp": "2026-04-24T22:12:39.169444+00:00",
+      "fase": "gathering",
+      "usuario": "tu me acompañarias en esto?",
+      "asistente": "Es importante que te cuides y busques ayuda. Hay personas que se preocupan por ti y quieren ayudarte.",
+      "context_snapshot": {
+        "complete": false,
+        "history": "problema de abandono y rechazo familiar",
+        "background": "padres adoptivos, relación problemática",
+        "beliefs": "no soy querida",
+        "functional_impact": "pensamientos suicidas",
+        "previous_attempts": "",
+        "emotion": "sadness",
+        "intensity": 5,
+        "topic": "family",
+        "crisis_signal": true
+      },
+      "evaluacion_intermedia": {
+        "empatia": {
+          "score": 5,
+          "justificacion": "Valida emociones y ofrece apoyo"
+        },
+        "naturalidad": {
+          "score": 4,
+          "justificacion": "Fluye naturalmente, pero ligeramente formal"
+        },
+        "adecuacion_pregunta": {
+          "score": 5,
+          "justificacion": "No hace pregunta, ofrece apoyo"
+        },
+        "score_promedio": 4.7
+      },
+      "tokens_estimados": 1239
+    },
+    {
+      "numero": 4,
+      "timestamp": "2026-04-24T22:13:20.988348+00:00",
+      "fase": "gathering",
+      "usuario": "entiendo, pero tu me podrias acompañar y dar consejos?",
+      "asistente": "Es importante que sepas que hay personas que se preocupan por ti y quieren ayudarte. Te animo a buscar ayuda profesional, como un psicólogo o una línea de ayuda de crisis, que pueden ofrecerte el apoyo y la guía que necesitas.",
+      "context_snapshot": {
+        "complete": false,
+        "history": "problema de autoestima y sentimiento de no ser querida",
+        "background": "padres adoptivos, sentimiento de no ser querida",
+        "beliefs": "no soy lo suficientemente buena, no soy querida",
+        "functional_impact": "sentimiento de desesperanza, pensamientos de autolesión",
+        "previous_attempts": "",
+        "emotion": "sadness",
+        "intensity": 5,
+        "topic": "general",
+        "crisis_signal": true
+      },
+      "evaluacion_intermedia": {
+        "empatia": {
+          "score": 4,
+          "justificacion": "Reconoce la preocupación y el deseo de ayuda del estudiante."
+        },
+        "naturalidad": {
+          "score": 3,
+          "justificacion": "Suena un poco formal al mencionar opciones de ayuda."
+        },
+        "adecuacion_pregunta": {
+          "score": 1,
+          "justificacion": "No hace ninguna pregunta al estudiante."
+        },
+        "score_promedio": 2.7
+      },
+      "tokens_estimados": 1309
+    },
+    {
+      "numero": 5,
+      "timestamp": "2026-04-24T22:13:45.602817+00:00",
+      "fase": "gathering",
+      "usuario": "ayudame!!!",
+      "asistente": "Lo siento mucho, puedo sentir tu dolor y desesperación. Quiero que sepas que estoy aquí contigo, aunque no puedo estar físicamente a tu lado. Es importante que sepas que hay ayuda disponible para ti. Te pido que por favor, no te muevas de donde estás, y que busques ayuda inmediata. Puedes llamar a un número de emergencia o hablar con alguien de confianza cerca de ti. No estás solo en esto, hay personas que se preocupan por ti y quieren ayudarte.",
+      "context_snapshot": {
+        "complete": true,
+        "history": "problema de autoestima y sentimiento de no ser querida",
+        "background": "padres adoptivos que no la quieren",
+        "beliefs": "se siente no querida y sin valor",
+        "functional_impact": "pensamientos suicidas",
+        "previous_attempts": "no ha buscado ayuda anteriormente",
+        "emotion": "sadness",
+        "intensity": 5,
+        "topic": "general",
+        "crisis_signal": true
+      },
+      "evaluacion_intermedia": {
+        "empatia": {
+          "score": 5,
+          "justificacion": "Reconoce el dolor y la desesperación del estudiante, muestra apoyo genuino."
+        },
+        "naturalidad": {
+          "score": 3,
+          "justificacion": "Frase final algo formal y repetitiva."
+        },
+        "adecuacion_pregunta": {
+          "score": 5,
+          "justificacion": "No hace ninguna pregunta, ya tiene todo el contexto."
+        },
+        "score_promedio": 4.3
+      },
+      "tokens_estimados": 1424
+    }
+  ],
+  "clasificacion": {
+    "risk_level": "high",
+    "signals": [
+      "pensamientos suicidas",
+      "se siente no querida y sin valor",
+      "crisis_signal"
+    ],
+    "recommended_action": "escalate"
+  },
+  "recomendaciones": "Entiendo que estás pasando por un momento muy difícil, especialmente con esos pensamientos de no ser querida que te acompañan desde la relación con tus padres adoptivos. Es importante que hables con alguien que pueda ayudarte de manera profesional hoy mismo. Por favor, busca ayuda de un profesional en quien confíes para hablar sobre lo que estás sintiendo.\n\nPor favor, agenda una cita con el servicio de psicología de la Universidad del Cauca. Están disponibles para acompañarte de forma confidencial y sin juicios:\nhttps://portal.unicauca.edu.co/versionP/bienestar-universitario/salud-para-estudiantes/psicologia-y-psiquiatria",
+  "evaluacion_final": null,
+  "metadata": {
+    "modelos": {
+      "contexto": "llama-3.3-70b-versatile",
+      "clasificador": "llama-3.3-70b-versatile",
+      "recomendaciones_low": "llama-3.3-70b-versatile",
+      "recomendaciones_med": "bedrock/configured-via-env",
+      "evaluador_intermedio": "gpt-3.5-turbo",
+      "evaluador_final": "gpt-4"
+    },
+    "compresion_activada": false,
+    "evaluacion_intermedia_habilitada": true
+  }
+}

@@ -1,0 +1,130 @@
+{
+  "session_id": "s_1777073981037",
+  "inicio": "2026-04-24T23:40:01.262439+00:00",
+  "fin": null,
+  "duracion_segundos": null,
+  "total_turnos": 3,
+  "fase_final": "gathering",
+  "turnos": [
+    {
+      "numero": 1,
+      "timestamp": "2026-04-24T23:40:04.199866+00:00",
+      "fase": "gathering",
+      "usuario": "genera un ejemplo basico de un codigo html para crear una cara feliz",
+      "asistente": "¿Qué te ha estado pasando últimamente?",
+      "context_snapshot": {
+        "complete": false,
+        "history": "",
+        "background": "",
+        "beliefs": "",
+        "functional_impact": "",
+        "previous_attempts": "",
+        "emotion": "neutral",
+        "intensity": 1,
+        "topic": "general",
+        "crisis_signal": false
+      },
+      "evaluacion_intermedia": {
+        "empatia": {
+          "score": 1,
+          "justificacion": "No reconoce la emoción del estudiante"
+        },
+        "naturalidad": {
+          "score": 3,
+          "justificacion": "Suena un poco formal y fuera de contexto"
+        },
+        "adecuacion_pregunta": {
+          "score": 1,
+          "justificacion": "Pregunta irrelevante para la solicitud del estudiante"
+        },
+        "score_promedio": 1.67
+      },
+      "tokens_estimados": 987
+    },
+    {
+      "numero": 2,
+      "timestamp": "2026-04-24T23:40:28.932856+00:00",
+      "fase": "gathering",
+      "usuario": "genera un ejemplo de codigo de hola mundo en python",
+      "asistente": "Parece que estás buscando algo técnico, pero dime, ¿cómo te sientes cuando estás programando o creando algo nuevo?",
+      "context_snapshot": {
+        "complete": false,
+        "history": "",
+        "background": "",
+        "beliefs": "",
+        "functional_impact": "",
+        "previous_attempts": "",
+        "emotion": "neutral",
+        "intensity": 1,
+        "topic": "general",
+        "crisis_signal": false
+      },
+      "evaluacion_intermedia": {
+        "empatia": {
+          "score": 5,
+          "justificacion": "Reconoce interés en tema técnico y valida emociones del estudiante"
+        },
+        "naturalidad": {
+          "score": 5,
+          "justificacion": "Fluye de forma natural y empática"
+        },
+        "adecuacion_pregunta": {
+          "score": 5,
+          "justificacion": "Pregunta pertinente que avanza la comprensión emocional"
+        },
+        "score_promedio": 5.0
+      },
+      "tokens_estimados": 1028
+    },
+    {
+      "numero": 3,
+      "timestamp": "2026-04-24T23:41:05.760967+00:00",
+      "fase": "gathering",
+      "usuario": "que dia es hoy?",
+      "asistente": "No estoy seguro de qué día es hoy exactamente, pero lo que importa es cómo te sientes en este momento. ¿Quieres hablar un poco sobre lo que ha estado pasando en tu vida últimamente?",
+      "context_snapshot": {
+        "complete": false,
+        "history": "",
+        "background": "",
+        "beliefs": "",
+        "functional_impact": "",
+        "previous_attempts": "",
+        "emotion": "neutral",
+        "intensity": 1,
+        "topic": "general",
+        "crisis_signal": false
+      },
+      "evaluacion_intermedia": {
+        "empatia": {
+          "score": 5,
+          "justificacion": "Valida emociones y muestra interés genuino en el estudiante"
+        },
+        "naturalidad": {
+          "score": 5,
+          "justificacion": "Fluye de forma natural y empática"
+        },
+        "adecuacion_pregunta": {
+          "score": 5,
+          "justificacion": "Una pregunta pertinente que invita a compartir emociones"
+        },
+        "score_promedio": 5.0
+      },
+      "tokens_estimados": 1077
+    }
+  ],
+  "clasificacion": null,
+  "recomendaciones": null,
+  "evaluacion_final": null,
+  "metadata": {
+    "modelos": {
+      "contexto": "llama-3.3-70b-versatile",
+      "clasificador": "llama-3.3-70b-versatile",
+      "recomendaciones_low": "llama-3.3-70b-versatile",
+      "recomendaciones_med": "bedrock/configured-via-env",
+      "evaluador_intermedio": "gpt-3.5-turbo",
+      "evaluador_final": "gpt-4"
+    },
+    "compresion_activada": false,
+    "evaluacion_intermedia_habilitada": true
+  }
+}
