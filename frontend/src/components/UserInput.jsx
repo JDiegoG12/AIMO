@@ -1,8 +1,15 @@
-import { useState, useRef, useCallback } from 'react'
+import { useState, useRef, useCallback, useEffect } from 'react'
 
 export default function UserInput({ enabled, complete, onSend }) {
   const [value,   setValue]   = useState('')
   const textareaRef = useRef(null)
+
+  // Auto-focus when the turn passes back to the user
+  useEffect(() => {
+    if (enabled && textareaRef.current) {
+      textareaRef.current.focus()
+    }
+  }, [enabled])
 
   const autoResize = useCallback(() => {
     const el = textareaRef.current

@@ -89,8 +89,10 @@ export default function App() {
   }, []);
 
   useEffect(() => {
+    // Only snap to bottom when a new user message is added.
+    // AIMO's typing scroll is handled inside MessageItem (per character).
     convoBottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, typingMsgIndex]);
+  }, [messages.length]);
 
   // ── Handlers ───────────────────────────────────────────────────────────────
 
