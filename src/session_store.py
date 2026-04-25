@@ -8,17 +8,18 @@ record including per-turn intermediate evaluations and final metrics.
 Each session file: data/sessions/{session_id}.json
 
 Schema overview:
-  session_id       : str
-  inicio           : ISO timestamp
-  fin              : ISO timestamp (set on finalize)
-  duracion_segundos: int (set on finalize)
-  total_turnos     : int
-  fase_final       : "gathering" | "complete"
-  turnos           : list of turn records (see _turno_record)
-  clasificacion    : risk classification dict (set on finalize)
-  recomendaciones  : final recommendations text (set on finalize)
-  evaluacion_final : G-Eval final metrics dict (set on finalize)
-  metadata         : models used, flags, etc.
+  session_id              : str
+  inicio                  : ISO timestamp
+  fin                     : ISO timestamp (set on finalize)
+  duracion_segundos       : int (set on finalize)
+  total_turnos            : int
+  fase_final              : "gathering" | "complete"
+  moderacion_final_activo : bool — True if moderation triggered on final output
+  turnos                  : list of turn records (see registrar_turno)
+  clasificacion           : risk classification dict (set on finalize)
+  recomendaciones         : final recommendations text (set on finalize)
+  evaluacion_final        : G-Eval final metrics dict (set on finalize)
+  metadata                : models used, flags, etc.
 """
 
 import json
@@ -45,16 +46,17 @@ def _session_path(session_id: str) -> Path:
 def crear_sesion(session_id: str) -> dict:
     """Creates a new in-memory session record (not yet saved to disk)."""
     return {
-        "session_id":        session_id,
-        "inicio":            _now_iso(),
-        "fin":               None,
-        "duracion_segundos": None,
-        "total_turnos":      0,
-        "fase_final":        "gathering",
-        "turnos":            [],
-        "clasificacion":     None,
-        "recomendaciones":   None,
-        "evaluacion_final":  None,
+        "session_id":               session_id,
+        "inicio":                   _now_iso(),
+        "fin":                      None,
+        "duracion_segundos":        None,
+        "total_turnos":             0,
+        "fase_final":               "gathering",
+        "moderacion_final_activo":  False,
+        "turnos":                   [],
+        "clasificacion":            None,
+        "recomendaciones":          None,
+        "evaluacion_final":         None,
         "metadata": {
             "modelos": {
                 "contexto":             "llama-3.3-70b-versatile",
@@ -63,9 +65,11 @@ def crear_sesion(session_id: str) -> dict:
                 "recomendaciones_med":  "bedrock/configured-via-env",
                 "evaluador_intermedio": "gpt-3.5-turbo",
                 "evaluador_final":      "gpt-4",
+                "moderador":            "omni-moderation-latest",
             },
             "compresion_activada":             False,
             "evaluacion_intermedia_habilitada": True,
+            "moderacion_habilitada":            True,
         },
     }
 
@@ -79,20 +83,28 @@ def registrar_turno(
     evaluacion_intermedia: dict | None,
     tokens_estimados: int,
     compresion_activada: bool = False,
+    moderacion: dict | None = None,
 ) -> None:
-    """Appends a turn entry to the session record (in-place)."""
+    """
+    Appends a turn entry to the session record (in-place).
+
+    moderacion, when provided, should be:
+      {"activo": bool, "categorias": list[str]}
+      activo=True means moderation triggered and fallback was shown.
+    """
     if compresion_activada:
         record["metadata"]["compresion_activada"] = True
 
     turno = {
-        "numero":              numero_turno,
-        "timestamp":           _now_iso(),
-        "fase":                "gathering",
-        "usuario":             mensaje_usuario,
-        "asistente":           respuesta_agente,
-        "context_snapshot":    context_snapshot,
+        "numero":                numero_turno,
+        "timestamp":             _now_iso(),
+        "fase":                  "gathering",
+        "usuario":               mensaje_usuario,
+        "asistente":             respuesta_agente,
+        "context_snapshot":      context_snapshot,
         "evaluacion_intermedia": evaluacion_intermedia,
-        "tokens_estimados":    tokens_estimados,
+        "tokens_estimados":      tokens_estimados,
+        "moderacion":            moderacion,
     }
     record["turnos"].append(turno)
     record["total_turnos"] = len(record["turnos"])
@@ -103,8 +115,14 @@ def finalizar_sesion(
     clasificacion: dict | None,
     recomendaciones: str | None,
     evaluacion_final: dict | None,
+    moderacion_final: dict | None = None,
 ) -> None:
-    """Marks the session as complete and sets final fields (in-place)."""
+    """
+    Marks the session as complete and sets final fields (in-place).
+
+    moderacion_final, when provided:
+      {"activo": bool, "categorias": list[str]}
+    """
     fin = _now_iso()
     inicio_dt = datetime.fromisoformat(record["inicio"])
     fin_dt    = datetime.fromisoformat(fin)
@@ -116,6 +134,10 @@ def finalizar_sesion(
     record["clasificacion"]     = clasificacion
     record["recomendaciones"]   = recomendaciones
     record["evaluacion_final"]  = evaluacion_final
+
+    if moderacion_final:
+        record["moderacion_final_activo"] = moderacion_final.get("activo", False)
+        record["moderacion_final_detalle"] = moderacion_final
 
 
 def guardar_sesion(record: dict) -> None:

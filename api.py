@@ -6,7 +6,13 @@ AIMO Flask API — v3
   2. Classifier     (aimo_classifier.txt)        — clinical risk assessment
   3. Recommendations (aimo_recommendations.txt) — final personalized output
 
-Per-turn evaluation (GPT-3.5-turbo) runs on EVERY context-gathering turn.
+Moderation (OpenAI omni-moderation-latest, free):
+  Every AIMO response — intermediate and final — is checked before delivery.
+  Categories blocked: self-harm/instructions, hate/threatening,
+  harassment/threatening, violence/graphic.
+  On trigger: safe fallback shown to student; incident logged in session record.
+
+Per-turn evaluation (GPT-3.5-turbo) runs on every context-gathering turn.
 Final evaluation (GPT-4) runs when recommendations are delivered (low/medium risk).
 All sessions are persisted as JSON in data/sessions/ for academic analysis.
 
@@ -15,7 +21,8 @@ Endpoints:
                    → { "response": "...", "phase": "gathering|complete",
                        "evaluation": {...}|null,
                        "evaluacion_intermedia": {...}|null,
-                       "classification": {...}|null }
+                       "classification": {...}|null,
+                       "moderacion_activa": bool }
 
   POST /api/reset  { "session_id": "..." }
                    → { "ok": true }
@@ -34,6 +41,7 @@ from src.agente_contexto        import obtener_contexto, _estimar_tokens
 from src.agente_clasificador    import clasificar_riesgo
 from src.agente_recomendaciones import generar_recomendaciones
 from src.agente_evaluador       import evaluar_interaccion, evaluar_turno_contexto
+from src.moderador              import moderar_salida, FALLBACK_MENSAJE
 from src.session_store          import (
     crear_sesion, registrar_turno, finalizar_sesion, guardar_sesion,
 )
@@ -45,15 +53,18 @@ app = Flask(__name__)
 CORS(app)
 
 # In-memory session state (pipeline data + academic record).
-# Structure per session_id:
 # {
 #   "context_history": list | None,
 #   "context_data":    dict | None,
 #   "phase":           "gathering" | "complete",
 #   "turn_count":      int,
-#   "academic_record": dict,   ← session_store record
+#   "academic_record": dict,
 # }
 _sessions: dict = {}
+
+
+def _construir_moderacion_record(es_segura: bool, categorias: list[str]) -> dict:
+    return {"activo": not es_segura, "categorias": categorias}
 
 
 @app.route("/api/chat", methods=["POST"])
@@ -83,10 +94,11 @@ def chat():
                 "Ya hemos completado nuestra conversación. "
                 "Si deseas comenzar de nuevo, puedes reiniciar la sesión."
             ),
-            "phase":                "complete",
-            "evaluation":           None,
+            "phase":                 "complete",
+            "evaluation":            None,
             "evaluacion_intermedia": None,
-            "classification":       None,
+            "classification":        None,
+            "moderacion_activa":     False,
         })
 
     # ── Phase: gathering ──────────────────────────────────────────────────────
@@ -99,7 +111,7 @@ def chat():
     visible_response, context_json, context_history = obtener_contexto(
         mensaje,
         session["context_history"],
-        session["context_data"],   # previous context_json for tone injection
+        session["context_data"],
     )
 
     tokens_despues = _estimar_tokens(context_history)
@@ -111,12 +123,25 @@ def chat():
 
     is_complete = bool(context_json and context_json.get("complete", False))
 
+    # ── Moderation: intermediate response ────────────────────────────────────
+    es_segura_inter, cats_inter = moderar_salida(visible_response)
+    mod_record_inter = _construir_moderacion_record(es_segura_inter, cats_inter)
+
+    if not es_segura_inter:
+        logger.warning(
+            "Moderación INTERMEDIA activada — turno %d, sesión %s, cats: %s",
+            turno_num, session_id, cats_inter,
+        )
+        visible_response = FALLBACK_MENSAJE
+
     # ── Intermediate evaluation (GPT-3.5-turbo) ───────────────────────────────
     evaluacion_intermedia = None
-    try:
-        evaluacion_intermedia = evaluar_turno_contexto(mensaje, visible_response, turno_num)
-    except Exception as e:
-        logger.warning("Evaluación intermedia falló en turno %d: %s", turno_num, e)
+    if es_segura_inter:
+        # Only evaluate if the response was not replaced by the fallback
+        try:
+            evaluacion_intermedia = evaluar_turno_contexto(mensaje, visible_response, turno_num)
+        except Exception as e:
+            logger.warning("Evaluación intermedia falló en turno %d: %s", turno_num, e)
 
     # Register turn in academic record
     registrar_turno(
@@ -128,6 +153,7 @@ def chat():
         evaluacion_intermedia=evaluacion_intermedia,
         tokens_estimados=tokens_despues,
         compresion_activada=compresion,
+        moderacion=mod_record_inter,
     )
     guardar_sesion(session["academic_record"])
 
@@ -139,17 +165,29 @@ def chat():
             "evaluation":            None,
             "evaluacion_intermedia": evaluacion_intermedia,
             "classification":        None,
+            "moderacion_activa":     not es_segura_inter,
         })
 
     # ── Context complete: classifier + recommendations ────────────────────────
     context_data = session["context_data"]
 
-    clasificacion  = clasificar_riesgo(context_data)
+    clasificacion   = clasificar_riesgo(context_data)
     recomendaciones = generar_recomendaciones(context_data, clasificacion)
 
-    # ── Final evaluation (GPT-4, low/medium risk only) ────────────────────────
+    # ── Moderation: final recommendations ────────────────────────────────────
+    es_segura_final, cats_final = moderar_salida(recomendaciones)
+    mod_record_final = _construir_moderacion_record(es_segura_final, cats_final)
+
+    if not es_segura_final:
+        logger.warning(
+            "Moderación FINAL activada — sesión %s, cats: %s",
+            session_id, cats_final,
+        )
+        recomendaciones = FALLBACK_MENSAJE
+
+    # ── Final evaluation (GPT-4, low/medium risk, only if response safe) ─────
     evaluacion_final = None
-    if clasificacion.get("risk_level") != "high":
+    if clasificacion.get("risk_level") != "high" and es_segura_final:
         try:
             context_str       = json.dumps(
                 {k: v for k, v in context_data.items() if k != 'complete'},
@@ -174,6 +212,7 @@ def chat():
         clasificacion,
         recomendaciones,
         evaluacion_final,
+        moderacion_final=mod_record_final,
     )
     guardar_sesion(session["academic_record"])
 
@@ -181,10 +220,11 @@ def chat():
     _sessions[session_id] = session
 
     logger.info(
-        "Sesión %s completada — risk=%s, composite=%s",
+        "Sesión %s completada — risk=%s, composite=%s, mod_final=%s",
         session_id,
         clasificacion.get("risk_level"),
         (evaluacion_final or {}).get("composite_score"),
+        not es_segura_final,
     )
 
     return jsonify({
@@ -193,6 +233,7 @@ def chat():
         "evaluation":            evaluacion_final,
         "evaluacion_intermedia": evaluacion_intermedia,
         "classification":        clasificacion,
+        "moderacion_activa":     not es_segura_final,
     })
 
 
