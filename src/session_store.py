@@ -1,7 +1,7 @@
 """
 Session Store — AIMO (academic analysis)
 ─────────────────────────────────────────
-Persists conversation sessions as JSON files in data/sessions/.
+Persists conversation sessions as JSON files in data/sessions/. 
 Designed for academic analysis: each file contains the full interaction
 record including per-turn intermediate evaluations and final metrics.
 
