@@ -1,7 +1,8 @@
-@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=DM+Sans:wght@400;500&display=swap');
 
 :root {
   --font: 'Press Start 2P', monospace;
+  --font-body: 'DM Sans', system-ui, sans-serif;
   --bg: #181e2d;
   --bg-soft: #20283b;
   --surface: #2a3445;
@@ -772,9 +773,9 @@ body,
   outline: none;
   background: #253042;
   color: var(--text);
-  font-family: var(--font);
-  font-size: 8px;
-  line-height: 1.75;
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.55;
   min-height: 34px;
   max-height: 66px;
   padding: 12px 12px 10px;
@@ -1125,8 +1126,9 @@ body,
   border-radius: 0;
   box-shadow: 2px 2px 0 var(--shadow-pixel), inset 0 0 0 1px rgba(255, 255, 255, 0.04);
   padding: 12px 14px;
-  font-size: 8px;
-  line-height: 2.05;
+  font-family: var(--font-body);
+  font-size: 13.5px;
+  line-height: 1.65;
   word-break: break-word;
 }
 
@@ -1159,8 +1161,9 @@ body,
 }
 
 .msg-item-text {
-  font-size: 8px;
-  line-height: 2.05;
+  font-family: var(--font-body);
+  font-size: 13.5px;
+  line-height: 1.65;
   word-break: break-word;
   /* color heredado de .bubble-aimo / .bubble-user según el rol */
 }
@@ -1562,8 +1565,9 @@ body,
   border: 1px solid var(--border);
   border-left: 3px solid var(--secondary);
   padding: 10px 12px;
-  font-size: 7px;
-  line-height: 2;
+  font-family: var(--font-body);
+  font-size: 13px;
+  line-height: 1.7;
   color: var(--text-dim);
   white-space: pre-wrap;
   word-break: break-word;
@@ -1635,15 +1639,17 @@ body,
 }
 
 .rec-text2 {
-  font-size: 7.5px;
+  font-family: var(--font-body);
+  font-size: 14px;
   color: var(--text);
-  line-height: 2.1;
+  line-height: 1.7;
 }
 
 .rec-item {
-  font-size: 7.5px;
+  font-family: var(--font-body);
+  font-size: 14px;
   color: var(--text);
-  line-height: 2.1;
+  line-height: 1.7;
   border-left: 3px solid var(--accent);
   padding-left: 10px;
   margin-left: 4px;
