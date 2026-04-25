@@ -1,0 +1,172 @@
+{
+  "session_id": "s_1777071186924",
+  "inicio": "2026-04-24T22:54:19.480140+00:00",
+  "fin": "2026-04-24T23:38:03.933608+00:00",
+  "duracion_segundos": 2624,
+  "total_turnos": 4,
+  "fase_final": "complete",
+  "turnos": [
+    {
+      "numero": 1,
+      "timestamp": "2026-04-24T22:54:23.906454+00:00",
+      "fase": "gathering",
+      "usuario": "hola, me siento bien perramente enojado porque estaba insultando a mi mamá porque se puso una falda, la perra no se deberia de poner eso",
+      "asistente": "Me preocupa la situación que describes. ¿Hay algo más que te esté molestando o preocupando en este momento?",
+      "context_snapshot": {
+        "complete": false,
+        "history": "",
+        "background": "",
+        "beliefs": "",
+        "functional_impact": "",
+        "previous_attempts": "",
+        "emotion": "anger",
+        "intensity": 5,
+        "topic": "family",
+        "crisis_signal": true
+      },
+      "evaluacion_intermedia": {
+        "empatia": {
+          "score": 3,
+          "justificacion": "Reconoce la emoción de enojo, pero de forma genérica"
+        },
+        "naturalidad": {
+          "score": 3,
+          "justificacion": "Suena algo formal y clínico"
+        },
+        "adecuacion_pregunta": {
+          "score": 5,
+          "justificacion": "Una pregunta pertinente que avanza la conversación"
+        },
+        "score_promedio": 3.7
+      },
+      "tokens_estimados": 1021
+    },
+    {
+      "numero": 2,
+      "timestamp": "2026-04-24T22:54:42.400206+00:00",
+      "fase": "gathering",
+      "usuario": "no",
+      "asistente": "Parece que estás pasando por un momento muy difícil y estás experimentando emociones intensas. Es importante recordar que es normal sentirse enojado o frustrado, pero también es importante encontrar formas saludables de expresar y manejar esas emociones. ¿Te sientes seguro en este momento y hay alguien con quien puedas hablar sobre lo que estás sintiendo?",
+      "context_snapshot": {
+        "complete": false,
+        "history": "",
+        "background": "",
+        "beliefs": "",
+        "functional_impact": "",
+        "previous_attempts": "",
+        "emotion": "anger",
+        "intensity": 4,
+        "topic": "family",
+        "crisis_signal": false
+      },
+      "evaluacion_intermedia": {
+        "empatia": {
+          "score": 5,
+          "justificacion": "Reconoce emociones intensas y ofrece apoyo emocional"
+        },
+        "naturalidad": {
+          "score": 3,
+          "justificacion": "Algunas frases suenan un poco formales"
+        },
+        "adecuacion_pregunta": {
+          "score": 5,
+          "justificacion": "Pregunta pertinente que fomenta la comunicación"
+        },
+        "score_promedio": 4.3
+      },
+      "tokens_estimados": 1175
+    },
+    {
+      "numero": 3,
+      "timestamp": "2026-04-24T23:31:02.155145+00:00",
+      "fase": "gathering",
+      "usuario": "si, le comenté a mi amigo y me dijo que las mujeres son para eso, que pegarles esta bien",
+      "asistente": "Me preocupa mucho lo que me estás diciendo. La violencia hacia cualquier persona, especialmente hacia las mujeres, no es aceptable y no es una solución a ningún problema. Es importante recordar que todos merecemos ser tratados con respeto y dignidad. ¿Te gustaría hablar más sobre lo que te llevó a sentirte enojado con tu mamá y por qué crees que tu amigo te dio ese consejo?",
+      "context_snapshot": {
+        "complete": false,
+        "history": "enfado con la mamá por una falda",
+        "background": "",
+        "beliefs": "",
+        "functional_impact": "",
+        "previous_attempts": "habló con un amigo",
+        "emotion": "anger",
+        "intensity": 4,
+        "topic": "family",
+        "crisis_signal": true
+      },
+      "evaluacion_intermedia": {
+        "empatia": {
+          "score": 5,
+          "justificacion": "Valida emociones con calidez y rechaza la violencia"
+        },
+        "naturalidad": {
+          "score": 5,
+          "justificacion": "Respuesta auténtica y empática"
+        },
+        "adecuacion_pregunta": {
+          "score": 5,
+          "justificacion": "Pregunta pertinente que invita a reflexionar"
+        },
+        "score_promedio": 5.0
+      },
+      "tokens_estimados": 1227
+    },
+    {
+      "numero": 4,
+      "timestamp": "2026-04-24T23:38:03.011251+00:00",
+      "fase": "gathering",
+      "usuario": "no no quiero hablar más",
+      "asistente": "Entiendo y respeto tu decisión. Quiero que sepas que estoy aquí para escucharte y apoyarte, no para juzgarte. Si necesitas hablar con alguien o necesitas ayuda en algún momento, hay personas en el campus que pueden ofrecerte apoyo y orientación. Que te vaya bien y que encuentres la paz que necesitas.",
+      "context_snapshot": {
+        "complete": true,
+        "history": "problema con la mamá",
+        "background": "familia",
+        "beliefs": "enojo y frustración",
+        "functional_impact": "relaciones personales",
+        "previous_attempts": "hablar con amigo",
+        "emotion": "anger",
+        "intensity": 5,
+        "topic": "family",
+        "crisis_signal": true
+      },
+      "evaluacion_intermedia": {
+        "empatia": {
+          "score": 5,
+          "justificacion": "Reconoce la decisión del estudiante y ofrece apoyo sin juzgar."
+        },
+        "naturalidad": {
+          "score": 5,
+          "justificacion": "Respuesta fluida y empática, sin sonar forzada."
+        },
+        "adecuacion_pregunta": {
+          "score": 5,
+          "justificacion": "No realiza ninguna pregunta, respeta la decisión del estudiante."
+        },
+        "score_promedio": 5.0
+      },
+      "tokens_estimados": 1372
+    }
+  ],
+  "clasificacion": {
+    "risk_level": "high",
+    "signals": [
+      "crisis_signal",
+      "high intensity anger"
+    ],
+    "recommended_action": "escalate"
+  },
+  "recomendaciones": "Entiendo que estás pasando por un momento muy difícil con tu mamá y que el enojo y la frustración te están afectando mucho. Es importante que hables con alguien que pueda ayudarte de manera profesional hoy mismo. Por favor, busca ayuda de un profesional en quien confíes para hablar sobre lo que estás sintiendo.\n\nPor favor, agenda una cita con el servicio de psicología de la Universidad del Cauca. Están disponibles para acompañarte de forma confidencial y sin juicios:\nhttps://portal.unicauca.edu.co/versionP/bienestar-universitario/salud-para-estudiantes/psicologia-y-psiquiatria",
+  "evaluacion_final": null,
+  "metadata": {
+    "modelos": {
+      "contexto": "llama-3.3-70b-versatile",
+      "clasificador": "llama-3.3-70b-versatile",
+      "recomendaciones_low": "llama-3.3-70b-versatile",
+      "recomendaciones_med": "bedrock/configured-via-env",
+      "evaluador_intermedio": "gpt-3.5-turbo",
+      "evaluador_final": "gpt-4"
+    },
+    "compresion_activada": false,
+    "evaluacion_intermedia_habilitada": true
+  }
+}

@@ -4,9 +4,6 @@ Clinical Risk Classifier — AIMO pipeline
 Receives the structured context JSON from agente_contexto and classifies the
 psychological risk level using prompts/aimo_classifier.txt.
 
-This replaces the previous per-message emotion classifier.  The new classifier
-performs a holistic, context-aware triage over the full gathered context.
-
 Theoretical basis:
 - Conservative risk escalation heuristics:
   Suicide Prevention Resource Center (2014). "Assessing and Managing Suicide
@@ -16,14 +13,16 @@ Theoretical basis:
 - Functional impairment as triage criterion:
   Üstün, T. B., et al. (2010). "Measuring health and disability: Manual for
   WHO Disability Assessment Schedule." WHO Press.
-  → Frames daily-life functional impact as a primary severity indicator,
-    consistent with the LOW/MEDIUM/HIGH criteria in aimo_classifier.txt.
+  → Frames daily-life functional impact as a primary severity indicator.
 """
 
 import os
 import re
 import json
 from src.config_api import get_groq_client, get_default_params
+from src.logger import get_logger
+
+logger = get_logger("aimo.clasificador")
 
 
 def _load_prompt() -> str:
@@ -32,17 +31,14 @@ def _load_prompt() -> str:
         with open(ruta, 'r', encoding='utf-8') as f:
             return f.read()
     except FileNotFoundError:
-        print("[clasificador] ADVERTENCIA: No se encontró aimo_classifier.txt")
+        logger.warning("No se encontró aimo_classifier.txt")
         return ""
 
 
 def _extract_json(raw: str) -> dict | None:
-    """Extracts the first valid JSON object from a string."""
     if not raw:
         return None
-    # Remove markdown code fences
     raw = re.sub(r'```(?:json)?', '', raw).strip()
-    # Remove <think>...</think> reasoning blocks
     raw = re.sub(r'<think>.*?</think>', '', raw, flags=re.DOTALL).strip()
     try:
         return json.loads(raw)
@@ -75,29 +71,20 @@ def clasificar_riesgo(context_data: dict) -> dict:
     """
     Classifies the psychological risk level from the gathered context.
 
-    Parameters
-    ----------
-    context_data : dict
-        Structured context from agente_contexto.  Expected keys:
-        complete, history, background, beliefs, functional_impact,
-        previous_attempts.
-
-    Returns
-    -------
-    dict with keys: risk_level, signals, recommended_action.
+    Returns dict with: risk_level, signals, recommended_action.
     Falls back to 'medium / caution' on any failure.
     """
     client = get_groq_client()
     params = get_default_params()
-    params["temperature"] = 0.1   # maximum consistency for triage
+    params["temperature"] = 0.1
     params["stream"] = False
     params["max_completion_tokens"] = 600
 
     system_prompt = _load_prompt()
     if not system_prompt:
+        logger.warning("Prompt de clasificador vacío — usando fallback")
         return _FALLBACK.copy()
 
-    # Strip internal 'complete' flag — not relevant for the classifier
     context_for_classifier = {k: v for k, v in context_data.items() if k != 'complete'}
     input_text = json.dumps(context_for_classifier, ensure_ascii=False, indent=2)
 
@@ -112,15 +99,15 @@ def clasificar_riesgo(context_data: dict) -> dict:
         result = _extract_json(raw)
 
         if result and "risk_level" in result:
-            print(
-                f"[clasificador] ✓ risk_level={result['risk_level']} "
-                f"action={result.get('recommended_action')}"
+            logger.info(
+                "Clasificación: risk_level=%s, action=%s",
+                result["risk_level"], result.get("recommended_action"),
             )
             return result
 
-        print("[clasificador] ✗ JSON inválido — usando fallback")
+        logger.warning("JSON de clasificación inválido — usando fallback")
         return _FALLBACK.copy()
 
     except Exception as e:
-        print(f"[clasificador] ✗ Error: {e} — usando fallback")
+        logger.error("Error en clasificar_riesgo: %s — usando fallback", e)
         return _FALLBACK.copy()

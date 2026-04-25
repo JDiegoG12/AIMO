@@ -2,6 +2,7 @@ import os
 from dotenv import load_dotenv
 from groq import Groq
 from openai import OpenAI
+import boto3
 
 # ==========================================
 # CARGA DE VARIABLES DE ENTORNO
@@ -68,3 +69,38 @@ def get_openai_client() -> OpenAI:
 def get_default_params() -> dict:
     """Returns a copy of the base Groq parameters dict."""
     return DEFAULT_PARAMS.copy()
+
+
+# ==========================================
+# CLIENTE AWS BEDROCK (agente de recomendaciones — riesgo medio)
+# ==========================================
+_bedrock_client = None
+
+
+def get_bedrock_client():
+    """
+    Returns a lazy-initialized boto3 bedrock-runtime client.
+    Reads AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, and AWS_REGION from .env.
+    Raises RuntimeError if credentials are missing.
+    """
+    global _bedrock_client
+    if _bedrock_client is None:
+        aws_access_key = os.getenv("AWS_ACCESS_KEY_ID")
+        aws_secret_key = os.getenv("AWS_SECRET_ACCESS_KEY")
+        aws_region = os.getenv("AWS_REGION", "us-east-1")
+
+        if not aws_access_key or not aws_secret_key:
+            raise RuntimeError(
+                "AWS credentials no disponibles. "
+                "Configura AWS_ACCESS_KEY_ID y AWS_SECRET_ACCESS_KEY en .env"
+            )
+
+        _bedrock_client = boto3.client(
+            service_name="bedrock-runtime",
+            region_name=aws_region,
+            aws_access_key_id=aws_access_key,
+            aws_secret_access_key=aws_secret_key,
+            aws_session_token=os.getenv("AWS_SESSION_TOKEN"),
+        )
+        print("[config] OK: Bedrock client inicializado correctamente")
+    return _bedrock_client

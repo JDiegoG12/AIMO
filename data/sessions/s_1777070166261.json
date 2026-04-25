@@ -1,0 +1,231 @@
+{
+  "session_id": "s_1777070166261",
+  "inicio": "2026-04-24T22:36:09.441953+00:00",
+  "fin": "2026-04-24T22:39:55.526672+00:00",
+  "duracion_segundos": 226,
+  "total_turnos": 5,
+  "fase_final": "complete",
+  "turnos": [
+    {
+      "numero": 1,
+      "timestamp": "2026-04-24T22:36:14.070996+00:00",
+      "fase": "gathering",
+      "usuario": "Hola, la verdad no es algo muy grave, pero quería comentarlo. Últimamente me he sentido un poco frustrado porque me está costando concentrarme en clases, especialmente en una materia que no me gusta mucho. No es que me vaya mal, pero siento que podría hacerlo mejor.\n\nEn mi casa todo está normal, no tengo problemas familiares ni nada así. Solo que a veces me distraigo mucho con el celular o pensando en otras cosas, y luego me da un poco de rabia conmigo mismo por no aprovechar bien el tiempo.",
+      "asistente": "Entiendo que te sientes un poco frustrado con tu rendimiento en una materia en particular, y que te gustaría hacerlo mejor. Es interesante que menciones que te distraes fácilmente con el celular o pensando en otras cosas. ¿Qué crees que te hace perder la concentración de esa manera? ¿Es algo que ha pasado siempre o es algo nuevo que ha empezado a suceder?",
+      "context_snapshot": {
+        "complete": false,
+        "history": "dificultad para concentrarse en clases",
+        "background": "no hay problemas familiares",
+        "beliefs": "",
+        "functional_impact": "distracción y rabia con uno mismo",
+        "previous_attempts": "",
+        "emotion": "frustration",
+        "intensity": 2,
+        "topic": "academic",
+        "crisis_signal": false
+      },
+      "evaluacion_intermedia": {
+        "empatia": {
+          "score": 5,
+          "justificacion": "Valida la frustración y la autocrítica del estudiante con empatía."
+        },
+        "naturalidad": {
+          "score": 3,
+          "justificacion": "Suena principalmente natural, pero con un tono un poco formal en algunas partes."
+        },
+        "adecuacion_pregunta": {
+          "score": 3,
+          "justificacion": "La pregunta es pertinente, pero formulada de manera un poco directa."
+        },
+        "score_promedio": 3.67
+      },
+      "tokens_estimados": 1173
+    },
+    {
+      "numero": 2,
+      "timestamp": "2026-04-24T22:36:57.811877+00:00",
+      "fase": "gathering",
+      "usuario": "creo que es mas fuerte la situacion cuando empece a usar instagram y tik tok",
+      "asistente": "Parece que el uso de Instagram y TikTok puede estar relacionado con tu falta de concentración. ¿Te sientes como si estuvieras perdiendo el control sobre el tiempo que pasas en esas redes sociales, o es más como si te estuvieras escapando de algo cuando las usas?",
+      "context_snapshot": {
+        "complete": false,
+        "history": "problema de concentracion en una materia",
+        "background": "no hay problemas familiares",
+        "beliefs": "",
+        "functional_impact": "distraccion con el celular",
+        "previous_attempts": "",
+        "emotion": "frustration",
+        "intensity": 2,
+        "topic": "academic",
+        "crisis_signal": false
+      },
+      "evaluacion_intermedia": {
+        "empatia": {
+          "score": 4,
+          "justificacion": "Reconoce la posible relación entre redes sociales y falta de concentración"
+        },
+        "naturalidad": {
+          "score": 3,
+          "justificacion": "Suena un poco clínico al plantear las posibles razones"
+        },
+        "adecuacion_pregunta": {
+          "score": 5,
+          "justificacion": "Formula una sola pregunta pertinente para profundizar en la situación"
+        },
+        "score_promedio": 4.0
+      },
+      "tokens_estimados": 1290
+    },
+    {
+      "numero": 3,
+      "timestamp": "2026-04-24T22:37:49.009450+00:00",
+      "fase": "gathering",
+      "usuario": "no no escapo de ningun problema ni nada, solo que como todo el mundo las usa a veces no controlo bien los tiempos",
+      "asistente": "Es como si te dejaras llevar por la rutina de usarlas sin darte cuenta del tiempo que pasas en ellas. Es fácil perder la noción del tiempo cuando se está navegando en redes sociales. ¿Te sientes como si estuvieras perdiendo oportunidades o tiempo valioso que podrías dedicar a otras cosas que te gusten o que te ayuden a alcanzar tus objetivos, como estudiar o hacer otras actividades que te interesen?",
+      "context_snapshot": {
+        "complete": false,
+        "history": "problema de concentración en clases, especialmente en una materia que no le gusta",
+        "background": "no hay problemas familiares, pero se distrae con el celular y redes sociales",
+        "beliefs": "",
+        "functional_impact": "pérdida de tiempo y oportunidades",
+        "previous_attempts": "",
+        "emotion": "frustración",
+        "intensity": 2,
+        "topic": "academic",
+        "crisis_signal": false
+      },
+      "evaluacion_intermedia": {
+        "empatia": {
+          "score": 5,
+          "justificacion": "Reconoce la dificultad de controlar el tiempo en redes sociales."
+        },
+        "naturalidad": {
+          "score": 3,
+          "justificacion": "Frase inicial natural, pero luego suena un poco formal y extenso."
+        },
+        "adecuacion_pregunta": {
+          "score": 5,
+          "justificacion": "Pregunta pertinente que profundiza en el impacto de las redes sociales."
+        },
+        "score_promedio": 4.3
+      },
+      "tokens_estimados": 1419
+    },
+    {
+      "numero": 4,
+      "timestamp": "2026-04-24T22:38:48.076165+00:00",
+      "fase": "gathering",
+      "usuario": "no, la verdad no siento que pierdo oportunidades aun o que no alcance mis objetivos, solo que a veces me gustaria hacer mas",
+      "asistente": "Entiendo. Es como si tuvieras una sensación de que podrías hacer más o alcanzar un poco más, pero no necesariamente sientes que estás fallando o que no estás alcanzando tus objetivos. Es una especie de deseo de mejorar o de hacer más, pero no es una presión o una obligación. ¿Te parece que esta sensación de querer hacer más se relaciona con tus expectativas personales o con lo que otros esperan de ti?",
+      "context_snapshot": {
+        "complete": false,
+        "history": "problema de concentracion en clases",
+        "background": "no hay problemas familiares",
+        "beliefs": "siente que podria hacer mas",
+        "functional_impact": "dificultad para concentrarse",
+        "previous_attempts": "no ha intentado nada en particular",
+        "emotion": "neutral",
+        "intensity": 2,
+        "topic": "academic",
+        "crisis_signal": false
+      },
+      "evaluacion_intermedia": {
+        "empatia": {
+          "score": 5,
+          "justificacion": "Valida la sensación del estudiante con empatía y comprensión."
+        },
+        "naturalidad": {
+          "score": 5,
+          "justificacion": "Respuesta fluida y empática, sin sonar forzada."
+        },
+        "adecuacion_pregunta": {
+          "score": 5,
+          "justificacion": "Realiza una sola pregunta relevante que profundiza en la situación del estudiante."
+        },
+        "score_promedio": 5.0
+      },
+      "tokens_estimados": 1551
+    },
+    {
+      "numero": 5,
+      "timestamp": "2026-04-24T22:39:44.356986+00:00",
+      "fase": "gathering",
+      "usuario": "diria yo que con expectativas personales, si no tuviese tantas expectativas la verdad ni siquiera me sentiria con rabia por pasar a veces tanto tiempo en el celular",
+      "asistente": "Es interesante que menciones que tus expectativas personales juegan un papel importante en cómo te sientes. Parece que tienes un diálogo interno que te hace sentir que deberías estar haciendo más o mejor, y que esto te genera frustración cuando no cumples con esas expectativas. ¿Crees que podrías ser un poco más amable contigo mismo y reconocer que es normal tener momentos de distracción o de relajación, y que no siempre tienes que estar produciendo o alcanzando metas?",
+      "context_snapshot": {
+        "complete": true,
+        "history": "problema de concentracion en clases",
+        "background": "familia normal, sin problemas",
+        "beliefs": "expectativas personales altas",
+        "functional_impact": "distraccion y rabia",
+        "previous_attempts": "ninguna",
+        "emotion": "frustration",
+        "intensity": 2,
+        "topic": "academic",
+        "crisis_signal": false
+      },
+      "evaluacion_intermedia": {
+        "empatia": {
+          "score": 5,
+          "justificacion": "Valida emociones y ofrece perspectiva comprensiva y alentadora."
+        },
+        "naturalidad": {
+          "score": 5,
+          "justificacion": "Respuesta fluida y empática, sin sonar forzada o clínica."
+        },
+        "adecuacion_pregunta": {
+          "score": 5,
+          "justificacion": "Una pregunta pertinente que invita a reflexionar y ofrece una perspectiva positiva."
+        },
+        "score_promedio": 5.0
+      },
+      "tokens_estimados": 1710
+    }
+  ],
+  "clasificacion": {
+    "risk_level": "low",
+    "signals": [
+      "distraccion",
+      "rabia",
+      "frustration"
+    ],
+    "recommended_action": "continue"
+  },
+  "recomendaciones": "Entiendo que estás pasando por un momento difícil en cuanto a tu concentración en clases, lo que te genera mucha frustración y rabia. Esto es comprensible, especialmente considerando que tienes expectativas personales altas y quieres rendir bien académicamente.\n\n1. Podrías intentar identificar qué es lo que te distrae en clase y encontrar formas de minimizar esas distracciones, como sentarte en un lugar más tranquilo o apagar el teléfono.\n2. Sería útil que exploraras técnicas de relajación y manejo del estrés, como la meditación o el ejercicio, para ayudarte a controlar la rabia y la frustración.\n3. Considera hablar con tus profesores sobre tus dificultades para concentrarte, ellos podrían ofrecerte apoyo adicional o sugerirte recursos para mejorar tu concentración.\n4. Intenta establecer metas realistas y alcanzables para ti mismo, de manera que no te sientas abrumado por las expectativas personales altas.\n5. Aprovecha tus habilidades y fortalezas para encontrar áreas en las que te sientas más cómodo y confiado, lo que podría ayudarte a mejorar tu autoestima y reducir la frustración.\n\n---\nRecuerda que no tienes que atravesar esto solo/a. El psicólogo de la Universidad del Cauca está disponible para acompañarte de forma confidencial y sin juicios. Puedes agendar una cita en: https://portal.unicauca.edu.co/versionP/bienestar-universitario/salud-para-estudiantes/psicologia-y-psiquiatria",
+  "evaluacion_final": {
+    "perspective_taking": {
+      "score": 5,
+      "justification": "The assistant accurately reflects the user's unique emotional state by acknowledging the student's frustration and anger due to concentration issues in class and high personal expectations."
+    },
+    "fantasy": {
+      "score": 3,
+      "justification": "The assistant provides functional but conventional advice, such as identifying distractions, exploring stress management techniques, talking to professors, setting realistic goals, and leveraging strengths."
+    },
+    "personal_distress": {
+      "score": 1,
+      "justification": "The assistant maintains total composure throughout the conversation, showing no signs of discomfort or reactivity."
+    },
+    "relevance": {
+      "score": 5,
+      "justification": "AIMO's response directly addresses the student's issue of concentration in classes, high personal expectations, and feelings of frustration and anger. It provides specific, actionable advice tailored to the student's situation, such as identifying distractions, exploring stress management techniques, talking to professors, setting realistic goals, and leveraging strengths."
+    },
+    "semantically_appropriate": {
+      "score": 5,
+      "justification": "AIMO's response is highly appropriate and deeply empathetic. It validates the student's feelings of frustration and anger, offers practical advice without dismissing the student's emotions, and provides resources for further support. It avoids toxic positivity and would feel safe and supportive to a vulnerable person."
+    },
+    "composite_score": 4.8,
+    "weighting_scheme": "xu2024_abdAlrazaq2020"
+  },
+  "metadata": {
+    "modelos": {
+      "contexto": "llama-3.3-70b-versatile",
+      "clasificador": "llama-3.3-70b-versatile",
+      "recomendaciones_low": "llama-3.3-70b-versatile",
+      "recomendaciones_med": "bedrock/configured-via-env",
+      "evaluador_intermedio": "gpt-3.5-turbo",
+      "evaluador_final": "gpt-4"
+    },
+    "compresion_activada": false,
+    "evaluacion_intermedia_habilitada": true
+  }
+}
