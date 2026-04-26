@@ -61,6 +61,9 @@ function mockResponse() {
 }
 
 export default function App() {
+  // ── API Base URL ───────────────────────────────────────────────────────────
+  const API_BASE = import.meta.env.VITE_API_URL || '';
+
   // ── Estado de la conversación ──────────────────────────────────────────────
   const [phase,          setPhase]          = useState(PHASES.INTRO);
   const [messages,       setMessages]       = useState([]);
@@ -103,7 +106,7 @@ export default function App() {
     try {
       let data;
       if (USE_API) {
-        const res = await fetch("/api/chat", {
+        const res = await fetch(`${API_BASE}/api/chat`, {
           method:  "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -162,7 +165,7 @@ export default function App() {
   const handleReset = async () => {
     if (USE_API) {
       try {
-        await fetch("/api/reset", {
+        await fetch(`${API_BASE}/api/reset`, {
           method:  "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ session_id: sessionId.current }),

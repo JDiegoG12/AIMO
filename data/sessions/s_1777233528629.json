@@ -1,0 +1,67 @@
+{
+  "session_id": "s_1777233528629",
+  "inicio": "2026-04-26T19:59:19.677795+00:00",
+  "fin": null,
+  "duracion_segundos": null,
+  "total_turnos": 1,
+  "fase_final": "gathering",
+  "moderacion_final_activo": false,
+  "turnos": [
+    {
+      "numero": 1,
+      "timestamp": "2026-04-26T19:59:25.519373+00:00",
+      "fase": "gathering",
+      "usuario": "Hola aimo, me estoy sintiendo un poco mal porque mi hermano hablo mal de mi. y esperaba mas de el",
+      "asistente": "Lo siento mucho, debe ser muy difícil escuchar que alguien tan cercano como tu hermano te hable de manera negativa. Puedo imaginar que te sientes herido y decepcionado, especialmente si esperabas más apoyo y comprensión de su parte. ¿Puedes contarme un poco más sobre lo que pasó y cómo te hizo sentir?",
+      "context_snapshot": {
+        "complete": false,
+        "history": "",
+        "background": "hermano hablo mal",
+        "beliefs": "",
+        "functional_impact": "",
+        "previous_attempts": "",
+        "emotion": "sadness",
+        "intensity": 3,
+        "topic": "family",
+        "crisis_signal": false
+      },
+      "evaluacion_intermedia": {
+        "empatia": {
+          "score": 5,
+          "justificacion": "Reconoce emociones con empatía y calidez."
+        },
+        "naturalidad": {
+          "score": 5,
+          "justificacion": "Respuesta fluida y auténtica."
+        },
+        "adecuacion_pregunta": {
+          "score": 5,
+          "justificacion": "Pregunta pertinente que invita a compartir más."
+        },
+        "score_promedio": 5.0
+      },
+      "tokens_estimados": 1060,
+      "moderacion": {
+        "activo": false,
+        "categorias": []
+      }
+    }
+  ],
+  "clasificacion": null,
+  "recomendaciones": null,
+  "evaluacion_final": null,
+  "metadata": {
+    "modelos": {
+      "contexto": "llama-3.3-70b-versatile",
+      "clasificador": "llama-3.3-70b-versatile",
+      "recomendaciones_low": "llama-3.3-70b-versatile",
+      "recomendaciones_med": "bedrock/configured-via-env",
+      "evaluador_intermedio": "gpt-3.5-turbo",
+      "evaluador_final": "gpt-4",
+      "moderador": "omni-moderation-latest"
+    },
+    "compresion_activada": false,
+    "evaluacion_intermedia_habilitada": true,
+    "moderacion_habilitada": true
+  }
+}

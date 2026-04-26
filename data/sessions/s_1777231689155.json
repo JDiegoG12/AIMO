@@ -1,0 +1,42 @@
+{
+  "session_id": "s_1777231689155",
+  "inicio": "2026-04-26T19:35:02.562095+00:00",
+  "fin": null,
+  "duracion_segundos": null,
+  "total_turnos": 1,
+  "fase_final": "gathering",
+  "moderacion_final_activo": false,
+  "turnos": [
+    {
+      "numero": 1,
+      "timestamp": "2026-04-26T19:35:04.627775+00:00",
+      "fase": "gathering",
+      "usuario": "Hola aimo, me estoy sintiendo un poco mal porque mi hermano hablo mal de mi. y esperaba mas de el",
+      "asistente": "Lo siento, tuve un problema de conexión. ¿Podrías repetirme lo que me contabas?",
+      "context_snapshot": null,
+      "evaluacion_intermedia": null,
+      "tokens_estimados": 1004,
+      "moderacion": {
+        "activo": false,
+        "categorias": []
+      }
+    }
+  ],
+  "clasificacion": null,
+  "recomendaciones": null,
+  "evaluacion_final": null,
+  "metadata": {
+    "modelos": {
+      "contexto": "llama-3.3-70b-versatile",
+      "clasificador": "llama-3.3-70b-versatile",
+      "recomendaciones_low": "llama-3.3-70b-versatile",
+      "recomendaciones_med": "bedrock/configured-via-env",
+      "evaluador_intermedio": "gpt-3.5-turbo",
+      "evaluador_final": "gpt-4",
+      "moderador": "omni-moderation-latest"
+    },
+    "compresion_activada": false,
+    "evaluacion_intermedia_habilitada": true,
+    "moderacion_habilitada": true
+  }
+}

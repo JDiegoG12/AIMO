@@ -31,10 +31,12 @@ Endpoints:
 import json
 import sys
 import os
+from dotenv import load_dotenv
 
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 
+load_dotenv()
 sys.path.insert(0, os.path.dirname(__file__))
 
 from src.agente_contexto        import obtener_contexto, _estimar_tokens
@@ -50,7 +52,12 @@ from src.logger import get_logger
 logger = get_logger("aimo.api")
 
 app = Flask(__name__)
-CORS(app)
+
+# Configurar CORS desde variables de entorno
+cors_origins = os.getenv("CORS_ORIGINS", "http://localhost:3000,http://localhost:5173").split(",")
+CORS(app, resources={
+    r"/api/*": {"origins": cors_origins}
+})
 
 # In-memory session state (pipeline data + academic record).
 # {
