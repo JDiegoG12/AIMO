@@ -53,11 +53,11 @@ logger = get_logger("aimo.api")
 
 app = Flask(__name__)
 
-# Configurar CORS desde variables de entorno
-cors_origins = os.getenv("CORS_ORIGINS", "http://localhost:3000,http://localhost:5173").split(",")
-CORS(app, resources={
-    r"/api/*": {"origins": cors_origins}
-})
+CORS(app,
+     origins=["http://localhost:3000", "http://localhost:5173",
+              "https://aimo-amber.vercel.app", "https://aimo-production-c6ad.up.railway.app"],
+     methods=["GET", "POST", "OPTIONS"],
+     allow_headers=["Content-Type"])
 
 # In-memory session state (pipeline data + academic record).
 # {
