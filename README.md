@@ -4,7 +4,7 @@
 [![Backend Status](https://img.shields.io/badge/Backend-Railway-0B0D0E?logo=railway)](https://railway.app)
 [![Python Version](https://img.shields.io/badge/Python-3.13+-3776ab?logo=python&logoColor=white)](https://www.python.org/)
 [![React Version](https://img.shields.io/badge/React-18+-61DAFB?logo=react&logoColor=white)](https://react.dev/)
-[![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
+[![License](https://img.shields.io/badge/License-All%20Rights%20Reserved-red)](LICENSE)
 
 ---
 
@@ -529,7 +529,11 @@ Objetivo: Alcanzar consistentemente puntuaciones **4-5 en empatía**.
 
 ## 📄 Licencia
 
-Este proyecto está bajo licencia **MIT**. Ver el archivo [LICENSE](LICENSE) para más detalles.
+**© 2026 Ana Sofia Arango Yanza, Juan Diego Gomez Garces, Juan David Vela Coronado**  
+Universidad del Cauca — Facultad de Ingeniería Electrónica y Telecomunicaciones
+
+Todos los derechos reservados. Queda prohibida la copia, distribución o uso del
+código sin autorización escrita de los autores. Ver [LICENSE](LICENSE) para más detalles.
 
 ---
 
